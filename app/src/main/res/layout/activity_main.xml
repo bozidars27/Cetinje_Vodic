@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.cetinje.bozo.cetinjevodic.MainActivity"
+    android:background="@android:color/white">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bg"
+        android:scaleType="centerCrop"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/border_up"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:id="@+id/banner"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:scaleType="centerCrop"
+        android:layout_height="@dimen/banner" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:clickable="true"
+        app:srcCompat="@android:drawable/ic_menu_info_details"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="130dp"
+        android:id="@+id/info"
+        app:backgroundTint="?attr/colorPrimary"
+        app:rippleColor="?attr/colorAccent"
+        app:elevation="10dp"
+        android:layout_width="@dimen/info"
+        android:layout_height="60dp"
+        app:fabSize="mini" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        app:srcCompat="@color/colorAccent"
+        android:id="@+id/border_up"
+        android:layout_below="@+id/banner"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:id="@+id/bottom"
+        android:layout_height="@dimen/bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:text="Route"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/title"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="@dimen/title_font"
+            android:layout_below="@+id/border_down"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="@dimen/title_marg" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:id="@+id/start_container"
+            android:layout_below="@+id/description_container">
+
+            <ImageView
+                android:layout_width="@dimen/start"
+                android:layout_height="@dimen/start"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/start" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/description_container"
+            android:layout_below="@+id/title"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:gravity="fill_horizontal|center"
+            android:layout_marginTop="@dimen/desc_marg">
+
+            <ImageView
+                android:layout_width="@dimen/arrow_dim"
+                android:layout_height="match_parent"
+                android:id="@+id/left"
+                android:layout_weight="1"
+                android:layout_marginLeft="@dimen/arrow_pad"
+                android:layout_marginStart="@dimen/arrow_pad"
+                app:srcCompat="@drawable/left" />
+
+            <TextView
+                android:text="See the recommended route shown on the map. Click the button to get started"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/title"
+                android:id="@+id/description"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:gravity="center"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="@dimen/arrow_dim"
+                android:layout_height="match_parent"
+                android:id="@+id/right"
+                android:layout_weight="1"
+                android:layout_marginRight="@dimen/arrow_pad"
+                android:layout_marginEnd="@dimen/arrow_pad"
+                app:srcCompat="@drawable/right" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            app:srcCompat="@color/colorAccent"
+            android:id="@+id/border_down"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/border_up"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/bottom"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/middle">
+
+        <ImageView
+            android:layout_width="@dimen/icon"
+            android:layout_height="@dimen/icon"
+            android:id="@+id/route"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <ImageView
+            android:layout_width="@dimen/icon"
+            android:layout_height="@dimen/icon"
+            android:id="@+id/objects"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/route"
+            android:layout_toEndOf="@+id/route" />
+
+        <ImageView
+            android:layout_width="@dimen/icon"
+            android:layout_height="@dimen/icon"
+            android:id="@+id/gallery"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/objects"
+            android:layout_toEndOf="@+id/objects" />
+
+        <ImageView
+            android:layout_width="@dimen/icon"
+            android:layout_height="@dimen/icon"
+            android:id="@+id/restaurants"
+            android:layout_below="@+id/route"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <ImageView
+            android:layout_width="@dimen/icon"
+            android:layout_height="@dimen/icon"
+            android:id="@+id/news"
+            android:layout_below="@+id/objects"
+            android:layout_toRightOf="@+id/route"
+            android:layout_toEndOf="@+id/route" />
+
+        <ImageView
+            android:layout_width="@dimen/icon"
+            android:layout_height="@dimen/icon"
+            android:id="@+id/quiz"
+            android:layout_below="@+id/objects"
+            android:layout_toRightOf="@+id/objects"
+            android:layout_toEndOf="@+id/objects" />
+    </RelativeLayout>
+
+</RelativeLayout>
