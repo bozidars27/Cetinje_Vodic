@@ -142,12 +142,12 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="5dp"
             app:srcCompat="@color/colorAccent"
             android:id="@+id/border_down"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_height="2dp" />
 
     </RelativeLayout>
 
@@ -161,14 +161,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:id="@+id/middle">
-
-        <ImageView
-            android:layout_width="@dimen/icon"
-            android:layout_height="@dimen/icon"
-            android:id="@+id/route"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
 
         <ImageView
             android:layout_width="@dimen/icon"
@@ -209,6 +201,14 @@
             android:layout_below="@+id/objects"
             android:layout_toRightOf="@+id/objects"
             android:layout_toEndOf="@+id/objects" />
+
+        <ImageView
+            android:layout_width="@dimen/icon"
+            android:layout_height="@dimen/icon"
+            android:id="@+id/route"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
     </RelativeLayout>
 
 </RelativeLayout>
