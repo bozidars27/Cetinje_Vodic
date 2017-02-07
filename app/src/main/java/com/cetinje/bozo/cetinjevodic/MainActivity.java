@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 
 public class MainActivity extends AppCompatActivity {
 
+    //coment 
     ImageView background;
     ImageView banner;
     RelativeLayout middle;
