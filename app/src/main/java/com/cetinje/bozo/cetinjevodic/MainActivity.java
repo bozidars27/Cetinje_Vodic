@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 import com.bumptech.glide.Glide;
 
 public class MainActivity extends AppCompatActivity {
-//Probadbaskd sddsd sdsd Pero je cmar
+
     ImageView background;
     ImageView banner;
     RelativeLayout middle;
