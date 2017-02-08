@@ -30,4 +30,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:8.4.0'
     compile 'com.android.support:design:23.3.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    compile 'org.osmdroid:osmdroid-android:5.6.3'
+    compile 'org.osmdroid:osmdroid-third-party:5.6.3'
 }

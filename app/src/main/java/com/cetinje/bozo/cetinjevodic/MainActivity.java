@@ -2,6 +2,7 @@ package com.cetinje.bozo.cetinjevodic;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -14,7 +15,6 @@ import android.widget.RelativeLayout;
 import com.bumptech.glide.Glide;
 
 public class MainActivity extends AppCompatActivity {
-//Milija komentar
     ImageView background;
     ImageView banner;
     RelativeLayout middle;
@@ -151,6 +151,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     animateIt(start, start, false);
+                }
+                if (currentlyUp == route){
+                    Intent myIntent = new Intent(v.getContext(), MapActivity.class);
+                    startActivityForResult(myIntent, 0);
                 }
                 return true;
             }
