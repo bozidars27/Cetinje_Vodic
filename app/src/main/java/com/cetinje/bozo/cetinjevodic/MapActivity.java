@@ -3,6 +3,8 @@ package com.cetinje.bozo.cetinjevodic;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -12,10 +14,16 @@ import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.views.MapView;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.PathOverlay;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import android.Manifest;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
 public class MapActivity extends Activity  implements MapEventsReceiver{
@@ -72,6 +80,48 @@ public class MapActivity extends Activity  implements MapEventsReceiver{
         mMapView.setUseDataConnection(false);
         MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, (MapEventsReceiver) this);
         mMapView.getOverlays().add(0, mapEventsOverlay);
+
+
+        float lat1 = 42.394237f, lng1 = 18.916687f, lat2 = 42.396598f, lng2 = 18.911923f, lat3 = 42.398341f, lng3 = 18.913575f, lat4 = 42.398088f, lng4 = 18.920549f;
+        GeoPoint gPt1 = new GeoPoint((int)(lat1 * 1E6), (int)(lng1 * 1E6));
+        GeoPoint gPt2 = new GeoPoint((int)(lat2 * 1E6), (int)(lng2 * 1E6));
+        GeoPoint gPt3 = new GeoPoint((int)(lat3 * 1E6), (int)(lng3 * 1E6));
+        GeoPoint gPt4 = new GeoPoint((int)(lat4 * 1E6), (int)(lng4 * 1E6));
+        ArrayList<GeoPoint> gPts = new ArrayList<GeoPoint>();
+        gPts.add(gPt);
+        gPts.add(gPt1);
+        gPts.add(gPt2);
+        gPts.add(gPt3);
+        gPts.add(gPt4);
+        Polyline pathOverlay = null;
+        pathOverlay = new Polyline(this.getApplicationContext());
+        pathOverlay.setPoints(gPts);
+        pathOverlay.setColor(R.color.colorAccent);
+        mMapView.getOverlays().add(pathOverlay);
+        // Create an ArrayList with overlays to display objects on map
+        ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
+        // Create som init objects
+        OverlayItem cetinjeMarker1 = new OverlayItem("Start", "Montenegro",
+                gPt);
+        OverlayItem cetinjeMarker2 = new OverlayItem("Prva lokacija", "Ime rute",
+                gPt1);
+        OverlayItem cetinjeMarker3 = new OverlayItem("Druga lokacija", "Ime rute",
+                gPt2);
+        OverlayItem cetinjeMarker4 = new OverlayItem("Treca lokacija", "Ime rute",
+                gPt3);
+        OverlayItem cetinjeMarker5 = new OverlayItem("Cetvrta lokacija", "Ime rute",
+                gPt4);
+        overlayItemArray.add(cetinjeMarker1);
+        overlayItemArray.add(cetinjeMarker2);
+        overlayItemArray.add(cetinjeMarker3);
+        overlayItemArray.add(cetinjeMarker4);
+        overlayItemArray.add(cetinjeMarker5);
+        Drawable newMarker = this.getResources().getDrawable(R.drawable.cetinje_marker);
+        cetinjeMarker1.setMarker(newMarker);
+        ItemizedIconOverlay<OverlayItem> itemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(this, overlayItemArray, null);
+        // Add the overlay to the MapView
+        mMapView.getOverlays().add(itemizedIconOverlay);
+
     }
     @Override
     public boolean singleTapConfirmedHelper(GeoPoint p) {
