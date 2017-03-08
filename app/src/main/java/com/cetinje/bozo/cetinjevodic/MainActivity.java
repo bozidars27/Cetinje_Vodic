@@ -2,18 +2,26 @@ package com.cetinje.bozo.cetinjevodic;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
+import android.Manifest;
 import com.bumptech.glide.Glide;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,10 +46,26 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView currentlyUp; //Indikator koji sluzi kako bi znali koje je od polja uvecano
 
+    DatabaseHelper db; // Lokalna baza
+    DataBaseHandler dbH; //Sinhronizacija sa serverskom bazom
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        db = new DatabaseHelper(getApplicationContext());
+        dbH = new DataBaseHandler(getApplicationContext(), db);
+        dbH.readFromDatabase();
+        //Toast.makeText(getApplicationContext(), String.valueOf(db.getAllCountrys().size()), Toast.LENGTH_SHORT).show();
+
+        //Trazenje dozvole da se pristupi EXTERNAL STORAGE-u i Lokaciji
+        int PERMISSION_ALL = 1;
+        String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION};
+
+        if(!hasPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
 
         background = (ImageView) findViewById(R.id.bg);
         banner = (ImageView) findViewById(R.id.banner);
@@ -154,14 +178,43 @@ public class MainActivity extends AppCompatActivity {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     animateIt(start, start, false);
                 }
-                if (currentlyUp == route){
-                    Intent myIntent = new Intent(v.getContext(), MapActivity.class);
-                    startActivity(myIntent);
+                else if (event.getAction() == MotionEvent.ACTION_UP && currentlyUp == route){
+
+                    (new Handler()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent i = new Intent(getBaseContext(), MapActivity.class);
+                            startActivity(i);
+                        }
+                    }, 400);
+
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP && currentlyUp == gallery){
+
+                    (new Handler()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent i = new Intent(getBaseContext(), Gallery.class);
+                            startActivity(i);
+                        }
+                    }, 400);
+
                 }
                 return true;
             }
         });
 
+    }
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private Boolean exit = false;
@@ -271,5 +324,4 @@ public class MainActivity extends AppCompatActivity {
         set.start();
 
     }
-
 }

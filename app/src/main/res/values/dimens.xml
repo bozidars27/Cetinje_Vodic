@@ -22,5 +22,17 @@
     <dimen name="main_act_padding">10dp</dimen>
     <dimen name="title_font">20sp</dimen>
 
+    <!-- Galerija -->
+    <dimen name="gallery_font">18sp</dimen>
+    <dimen name="gallery_item_font">15sp</dimen>
+
+    <dimen name="gallery_pager_title_font">25sp</dimen>
+    <dimen name="title_padding">10dp</dimen>
+    <dimen name="title_padding_horizontal">15dp</dimen>
+    <dimen name="description_font">18sp</dimen>
+    <dimen name="description_padding_top">25dp</dimen>
+    <dimen name="description_padding_horizontal">50dp</dimen>
+
+
 
 </resources>
