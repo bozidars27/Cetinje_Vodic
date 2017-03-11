@@ -200,6 +200,17 @@ public class MainActivity extends AppCompatActivity {
                     }, 400);
 
                 }
+                else if (event.getAction() == MotionEvent.ACTION_UP && currentlyUp == restaurants){
+
+                    (new Handler()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent i = new Intent(getBaseContext(), RestaurantActivity.class);
+                            startActivity(i);
+                        }
+                    }, 400);
+
+                }
                 return true;
             }
         });

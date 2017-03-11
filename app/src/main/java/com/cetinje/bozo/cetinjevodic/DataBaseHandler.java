@@ -26,7 +26,7 @@ public class DataBaseHandler {
     Context applicationContext;
     //private String server = "http://192.168.100.3/";
     //private String server = "http://89.188.33.100/";
-    private String server = "http://192.168.0.101/";
+    private String server = "http://89.188.33.111/";
 
     private RequestQueue requestQueue;
     private String readUrlCountry = server + "countries";
@@ -35,6 +35,8 @@ public class DataBaseHandler {
     private String readUrlPath = server + "paths?id=1";
     private String getReadUrlCulturalHeritage = server + "caltural_heritages?id_town=1&id_tour=1";
     private String getReadUrlVideo = server + "videos";
+    //daj sve restorane iz grada sa id_town=1
+    private String readUrlRestaurant = server + "restaurant?id_town=1";
     private DatabaseHelper db;
     private ArrayList<Video> videos;
     public DataBaseHandler(Context applicationContext, DatabaseHelper db) {
@@ -337,6 +339,50 @@ public class DataBaseHandler {
                 error.printStackTrace();
             }
         }, null);
+
+
+
+        //popunjavanje restorana
+        JsonObjectRequest jsonObjectRestaurant = new JsonObjectRequest(Request.Method.GET, readUrlRestaurant, null,
+
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        if(db.getAllRestaurants().size() == 0)
+                        {//ako nema restorana upisuj bazu
+                            //Toast.makeText(applicationContext, "Drzave" + String.valueOf(db.getAllCountrys().size()), Toast.LENGTH_SHORT).show();
+                            try {
+                                JSONArray speciesJsonArray = response.getJSONArray("Restaurants");
+                                for (int i = 0; i < speciesJsonArray.length(); i++){
+                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                    db.createRestaurant(new Restaurant(speciesJsonObject.getInt("id"),
+                                            speciesJsonObject.getInt("id_town"),
+                                            speciesJsonObject.getString("name"),
+                                            speciesJsonObject.getString("description"),
+                                            (float) speciesJsonObject.getDouble("lat"),
+                                            (float) speciesJsonObject.getDouble("lng"),
+                                            speciesJsonObject.getString("price_list")
+                                            ));
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        else
+                        {
+                            //Toast.makeText(applicationContext, "Baza je vec puna.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+
+
         //RequestQueue mRequestQueue = Volley.newRequestQueue(applicationContext, new HurlStack()); //za HTTPS konekciju
         requestQueue.add(requestFileMap);
 
@@ -347,6 +393,8 @@ public class DataBaseHandler {
         requestQueue.add(jsonObjectRequestPath);
         requestQueue.add(jsonObjectRequestCulturalHeritage);
         requestQueue.add(jsonObjectRequestVideo);
+
+        requestQueue.add(jsonObjectRestaurant);
 
     }
 

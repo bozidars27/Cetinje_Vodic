@@ -464,6 +464,69 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return videos;
     }
 
+
+
+
+    //upis u lokalnu bazu
+    public double createRestaurant(Restaurant restaurant) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID_TOWN, restaurant.getId_town());
+        values.put(KEY_NAME, restaurant.getName());
+        values.put(KEY_DESCRIPTION, restaurant.getDescription());
+        values.put(KEY_LAT, restaurant.getLat());
+        values.put(KEY_LNG, restaurant.getLng());
+        values.put(KEY_PRICE_LIST, restaurant.getPrice_list());
+
+        // insert row
+        float restaurant_id = db.insert(TABLE_RESTAURANT, null, values);
+        //vraca -1 ako nije upisao
+        return restaurant_id;
+    }
+    //
+    public ArrayList<String> getAllRestaurantsName() {
+        ArrayList<String> restaurants = new ArrayList<String>();
+        String selectQuery = "SELECT  " + KEY_NAME + " FROM " + TABLE_RESTAURANT;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                // adding to todo list
+                restaurants.add(c.getString(c.getColumnIndex(KEY_NAME)));
+            } while (c.moveToNext());
+        }
+        return restaurants;
+    }
+    //lista restorana iz lokalne baze
+    public ArrayList<Restaurant> getAllRestaurants() {
+        ArrayList<Restaurant> restaurants = new ArrayList<Restaurant>();
+        String selectQuery = "SELECT  * FROM " + TABLE_RESTAURANT;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Restaurant restaurant = new Restaurant(c.getInt(c.getColumnIndex(KEY_ID)),
+                        c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
+                        c.getString(c.getColumnIndex(KEY_NAME)),
+                        c.getString(c.getColumnIndex(KEY_DESCRIPTION)),
+                        c.getFloat(c.getColumnIndex(KEY_LAT)),
+                        c.getFloat(c.getColumnIndex(KEY_LNG)),
+                        c.getString(c.getColumnIndex(KEY_PRICE_LIST)));
+
+                // adding to todo list
+                restaurants.add(restaurant);
+            } while (c.moveToNext());
+        }
+        return restaurants;
+    }
+
     // closing database
     public void closeDB() {
         SQLiteDatabase db = this.getReadableDatabase();

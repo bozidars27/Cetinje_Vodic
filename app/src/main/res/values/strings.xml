@@ -6,5 +6,6 @@
 
     <!-- Galerija -->
     <string name="gallery_toolbar">Galerija</string>
+    <string name="title_activity_restaurant">RestaurantActivity</string>
 
 </resources>

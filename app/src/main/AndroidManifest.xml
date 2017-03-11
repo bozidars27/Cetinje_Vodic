@@ -24,7 +24,11 @@
         </activity>
         <activity android:name=".MapActivity" />
         <activity android:name=".Gallery" />
-        <activity android:name=".GalleryPager"></activity>
+        <activity android:name=".GalleryPager" />
+        <activity
+            android:name=".RestaurantActivity"
+            android:label="@string/title_activity_restaurant"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
