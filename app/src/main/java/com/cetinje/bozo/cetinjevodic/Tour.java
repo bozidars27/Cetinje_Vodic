@@ -9,15 +9,17 @@ public class Tour {
     int id_town;
     String name;
     String code;
+    Boolean ind;
 
     public Tour() {
     }
 
-    public Tour(int id, int id_town, String name, String code) {
+    public Tour(int id, int id_town, String name, String code, Boolean ind) {
         this.id = id;
         this.id_town = id_town;
         this.name = name;
         this.code = code;
+        this.ind = ind;
     }
 
     public int getId() {
@@ -36,6 +38,10 @@ public class Tour {
         return code;
     }
 
+    public Boolean getInd() {
+        return ind;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -50,5 +56,9 @@ public class Tour {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public void setInd(Boolean ind) {
+        this.ind = ind;
     }
 }

@@ -48,6 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ID_CULTURAL_HERITAGE = "id_cultural_heritage";
     private static final String KEY_IND = "ind";
     private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_LOGO = "logo";
 
     // TOWN Table - column names
     private static final String KEY_ID_COUNTRY = "id_country";
@@ -64,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_FANS3 = "Fans3";
 
     // RESTAURANT Table - column names
-    private static final String KEY_PRICE_LIST = "price_list";
+    private static final String KEY_DISCOUNT = "discount";
 
     // FEEDBACK Table - column names
     private static final String KEY_ID_RESTAURANT = "id_restaurant";
@@ -73,9 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // IMAGE Table - column names
     private static final String KEY_CITY_NAME = "city_name";
-
-    // CULTURAL_HERITAGE Table - column names
-    private static final String KEY_LOGO = "logo";
+    private static final String KEY_IMAGE_NAME = "image_name";
 
     // TEXT Table - column names
     private static final String KEY_ID_VIDEO = "id_video";
@@ -100,6 +99,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ID_TOWN + " INTEGER, "
             + KEY_CODE + " TEXT, "
             + KEY_NAME + " TEXT, "
+            + KEY_IND + " INTEGER, "
             + " FOREIGN KEY ("+KEY_ID_TOWN+") REFERENCES " + TABLE_TOWN + "(" +KEY_ID +"))";
 
     // User table create statement
@@ -115,7 +115,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ID_TOUR + " INTEGER, "
             + KEY_LAT + " REAL, "
             + KEY_LNG + " REAL, "
-            + KEY_IND + " INTEGER, "
             + " FOREIGN KEY ("+KEY_ID_TOUR+") REFERENCES " + TABLE_TOUR + "(" +KEY_ID +"))";
 
     // Quiz table create statement
@@ -137,8 +136,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_NAME + " TEXT, "
             + KEY_LAT + " REAL, "
             + KEY_LNG + " REAL, "
-            + KEY_PRICE_LIST + " TEXT, "
+            + KEY_LOGO + " TEXT, "
             + KEY_DESCRIPTION + " TEXT, "
+            + KEY_DISCOUNT + " INTEGER, "
             + " FOREIGN KEY ("+KEY_ID_TOWN+") REFERENCES " + TABLE_TOWN + "(" +KEY_ID +"))";
 
     // Feedback table create statement
@@ -152,22 +152,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // CulturalHeritage table create statement
     private static final String CREATE_TABLE_CULTURAL_HERITAGE = "CREATE TABLE "
             + TABLE_CULTURAL_HERITAGE + "(" + KEY_ID + " INTEGER PRIMARY KEY, "
-            + KEY_ID_TOWN + " INTEGER, "
             + KEY_ID_TOUR + " INTEGER, "
             + KEY_NAME + " TEXT, "
+            + KEY_DESCRIPTION + " TEXT, "
             + KEY_LAT + " REAL, "
             + KEY_LNG + " REAL, "
             + KEY_LOGO + " TEXT, "
-            + " FOREIGN KEY ("+KEY_ID_TOWN+") REFERENCES " + TABLE_TOWN + "(" +KEY_ID +"), "
             + " FOREIGN KEY ("+KEY_ID_TOUR+") REFERENCES " + TABLE_TOUR + "(" +KEY_ID +"))";
 
     // Image table create statement
     private static final String CREATE_TABLE_IMAGE = "CREATE TABLE "
-            + TABLE_IMAGE + "(" + KEY_ID + " INTEGER PRIMARY KEY, "
+            + TABLE_IMAGE + "(" + KEY_IMAGE_NAME + " TEXT, "
             + KEY_ID_CULTURAL_HERITAGE + " INTEGER, "
-            + KEY_NAME + " TEXT, "
-            + KEY_DESCRIPTION + " TEXT, "
             + KEY_CITY_NAME + " TEXT, "
+            + KEY_DESCRIPTION + " TEXT, "
+            + KEY_NAME + " TEXT, "
             + " FOREIGN KEY ("+KEY_ID_CULTURAL_HERITAGE+") REFERENCES " + TABLE_CULTURAL_HERITAGE + "(" +KEY_ID +"))";
 
     // Video table create statement
@@ -227,11 +226,84 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void reCreateTableCountry(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COUNTRY);
+        db.execSQL(CREATE_TABLE_COUNTRY);
+    }
+
+    public void reCreateTableTown(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOWN);
+        db.execSQL(CREATE_TABLE_TOWN);
+    }
+
+    public void reCreateTableTour(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOUR);
+        db.execSQL(CREATE_TABLE_TOUR);
+    }
+
+    public void reCreateTableUser(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL(CREATE_TABLE_USER);
+    }
+
+    public void reCreateTablePath(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PATH);
+        db.execSQL(CREATE_TABLE_PATH);
+    }
+
+    public void reCreateTableQuiz(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUIZ);
+        db.execSQL(CREATE_TABLE_QUIZ);
+    }
+
+    public void reCreateTableRestaurant(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RESTAURANT);
+        db.execSQL(CREATE_TABLE_RESTAURANT);
+
+    }
+
+    public void reCreateTableFeedback(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FEEDBACK);
+        db.execSQL(CREATE_TABLE_FEEDBACK);
+    }
+
+    public void reCreateTableCulturalHeritage(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CULTURAL_HERITAGE);
+        db.execSQL(CREATE_TABLE_CULTURAL_HERITAGE);
+    }
+
+    public void reCreateTableImage(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_IMAGE);
+        db.execSQL(CREATE_TABLE_IMAGE);
+    }
+
+    public void reCreateTableVideo(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_VIDEO);
+        db.execSQL(CREATE_TABLE_VIDEO);
+    }
+
+    public void reCreateTableText(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEXT);
+        db.execSQL(CREATE_TABLE_TEXT);
+    }
+
     public double createCountry(Country country) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        //values.put(KEY_ID, country.getId());
+        values.put(KEY_ID, country.getId());
         values.put(KEY_NAME, country.getName());
 
         // insert row
@@ -281,7 +353,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        //values.put(KEY_ID, country.getId());
+        values.put(KEY_ID, town.getId());
         values.put(KEY_ID_COUNTRY, town.getId_country());
         values.put(KEY_NAME, town.getName());
 
@@ -316,10 +388,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        //values.put(KEY_ID, country.getId());
+        values.put(KEY_ID, tour.getId());
         values.put(KEY_ID_TOWN, tour.getId_town());
         values.put(KEY_NAME, tour.getName());
         values.put(KEY_CODE, tour.getCode());
+        values.put(KEY_IND, tour.getInd());
 
         // insert row
         float tour_id = db.insert(TABLE_TOUR, null, values);
@@ -337,8 +410,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
-                Tour tour = new Tour(c.getInt((c.getColumnIndex(KEY_ID))), c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
-                        c.getString(c.getColumnIndex(KEY_NAME)), c.getString(c.getColumnIndex(KEY_CODE)));
+                Tour tour = new Tour(c.getInt(c.getColumnIndex(KEY_ID)), c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
+                        c.getString(c.getColumnIndex(KEY_NAME)), c.getString(c.getColumnIndex(KEY_CODE)), c.getInt(c.getColumnIndex(KEY_IND)) > 0);
 
                 // adding to todo list
                 tours.add(tour);
@@ -347,15 +420,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return tours;
     }
 
+    public boolean isScannedTour(String code){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectQuery = "SELECT  * FROM " + TABLE_TOUR + " WHERE code = '" + code + "'";
+        String updatedRout = "UPDATE " + TABLE_TOUR + " SET " + KEY_IND + " = 1 WHERE code = '" + code + "'";
+        db.execSQL(updatedRout);
+        Cursor c = db.rawQuery(selectQuery, null);
+        return c.getCount() > 0;
+    }
+
     public float createPath(Path path) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        //values.put(KEY_ID, country.getId());
+        values.put(KEY_ID, path.getId());
         values.put(KEY_ID_TOUR, path.getId_tour());
         values.put(KEY_LAT, path.getLat());
         values.put(KEY_LNG, path.getLng());
-        values.put(KEY_IND, path.isInd());
 
         // insert row
         float path_id = db.insert(TABLE_PATH, null, values);
@@ -374,8 +455,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 Path path = new Path(c.getInt((c.getColumnIndex(KEY_ID))), c.getInt(c.getColumnIndex(KEY_ID_TOUR)),
-                        c.getFloat(c.getColumnIndex(KEY_LAT)), c.getFloat(c.getColumnIndex(KEY_LNG)),
-                        c.getInt(c.getColumnIndex(KEY_IND)) > 0);
+                        c.getFloat(c.getColumnIndex(KEY_LAT)), c.getFloat(c.getColumnIndex(KEY_LNG)));
 
                 // adding to todo list
                 paths.add(path);
@@ -388,10 +468,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        //values.put(KEY_ID, country.getId());
-        values.put(KEY_ID_TOWN, cultural_heritage.getId_town());
+        values.put(KEY_ID, cultural_heritage.getId());
         values.put(KEY_ID_TOUR, cultural_heritage.getId_tour());
         values.put(KEY_NAME, cultural_heritage.getName());
+        values.put(KEY_DESCRIPTION, cultural_heritage.getDescription());
         values.put(KEY_LAT, cultural_heritage.getLat());
         values.put(KEY_LNG, cultural_heritage.getLng());
         values.put(KEY_LOGO, cultural_heritage.getLogo());
@@ -413,9 +493,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 CulturalHeritage cultural_heritage = new CulturalHeritage(c.getInt((c.getColumnIndex(KEY_ID))),
-                        c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
                         c.getInt(c.getColumnIndex(KEY_ID_TOUR)),
                         c.getString(c.getColumnIndex(KEY_NAME)),
+                        c.getString(c.getColumnIndex(KEY_DESCRIPTION)),
                         c.getFloat(c.getColumnIndex(KEY_LAT)),
                         c.getFloat(c.getColumnIndex(KEY_LNG)),
                         c.getString(c.getColumnIndex(KEY_LOGO)));
@@ -431,7 +511,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        //values.put(KEY_ID, country.getId());
+        values.put(KEY_ID, video.getId());
         values.put(KEY_ID_CULTURAL_HERITAGE, video.getId_cultural_heritage());
         values.put(KEY_NAME, video.getName());
         values.put(KEY_IND, video.isInd());
@@ -462,6 +542,106 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
         return videos;
+    }
+
+    public float createImage(Image image) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_IMAGE_NAME, image.getImageName());
+        values.put(KEY_ID_CULTURAL_HERITAGE, 1);
+        values.put(KEY_NAME, image.getName());
+        values.put(KEY_DESCRIPTION, image.getDescription());
+        values.put(KEY_CITY_NAME, image.getCityName());
+
+        float imageId = db.insert(TABLE_IMAGE, null, values);
+
+        return imageId;
+    }
+
+    public ArrayList<Image> getAllImages() {
+        ArrayList<Image> allImages = new ArrayList<>();
+        String selectQuery = "SELECT image_name, name, description, city_name FROM " + TABLE_IMAGE + " ORDER BY city_name ASC";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if ( c.moveToFirst() ) {
+
+            do {
+                allImages.add(new Image(c.getString(c.getColumnIndex(KEY_IMAGE_NAME)),
+                        1,
+                        c.getString(c.getColumnIndex(KEY_NAME)),
+                        c.getString(c.getColumnIndex(KEY_DESCRIPTION)),
+                        c.getString(c.getColumnIndex(KEY_CITY_NAME))));
+            } while (c.moveToNext());
+        }
+
+        return allImages;
+    }
+
+    //upis u lokalnu bazu
+    public double createRestaurant(Restaurant restaurant) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, restaurant.getId());
+        values.put(KEY_ID_TOWN, restaurant.getId_town());
+        values.put(KEY_NAME, restaurant.getName());
+        values.put(KEY_DESCRIPTION, restaurant.getDescription());
+        values.put(KEY_LAT, restaurant.getLat());
+        values.put(KEY_LNG, restaurant.getLng());
+        values.put(KEY_DISCOUNT, restaurant.getDiscount());
+        values.put(KEY_LOGO, restaurant.getLogo());
+
+        // insert row
+        float restaurant_id = db.insert(TABLE_RESTAURANT, null, values);
+        //vraca -1 ako nije upisao
+        return restaurant_id;
+    }
+    //
+    public ArrayList<String> getAllRestaurantsName() {
+        ArrayList<String> restaurants = new ArrayList<String>();
+        String selectQuery = "SELECT  " + KEY_NAME + " FROM " + TABLE_RESTAURANT;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                // adding to todo list
+                restaurants.add(c.getString(c.getColumnIndex(KEY_NAME)));
+            } while (c.moveToNext());
+        }
+        return restaurants;
+    }
+    //lista restorana iz lokalne baze
+    public ArrayList<Restaurant> getAllRestaurants() {
+        ArrayList<Restaurant> restaurants = new ArrayList<Restaurant>();
+        String selectQuery = "SELECT  * FROM " + TABLE_RESTAURANT;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Restaurant restaurant = new Restaurant(c.getInt(c.getColumnIndex(KEY_ID)),
+                        c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
+                        c.getString(c.getColumnIndex(KEY_NAME)),
+                        c.getString(c.getColumnIndex(KEY_DESCRIPTION)),
+                        c.getInt(c.getColumnIndex(KEY_DISCOUNT)),
+                        c.getFloat(c.getColumnIndex(KEY_LAT)),
+                        c.getFloat(c.getColumnIndex(KEY_LNG)),
+                        c.getString(c.getColumnIndex(KEY_LOGO)));
+
+                // adding to todo list
+                restaurants.add(restaurant);
+            } while (c.moveToNext());
+        }
+        return restaurants;
     }
 
     // closing database

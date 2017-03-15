@@ -16,59 +16,166 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class DataBaseHandler {
 
     Context applicationContext;
     //private String server = "http://192.168.100.3/";
     //private String server = "http://89.188.33.100/";
-    private String server = "http://192.168.0.101/";
+    private String server = "http://192.168.0.105/";
 
     private RequestQueue requestQueue;
     private String readUrlCountry = server + "countries";
-    private String readUrlTown = server + "towns?id=1";
+    private String readUrlTown = server + "towns";
     private String readUrlTour = server + "tours";
-    private String readUrlPath = server + "paths?id=1";
-    private String getReadUrlCulturalHeritage = server + "caltural_heritages?id_town=1&id_tour=1";
-    private String getReadUrlVideo = server + "videos";
+    private String readUrlPath = server + "paths";
+    private String getReadUrlCulturalHeritage = server + "caltural_heritages";
+    private String getReadUrlVideo = server + "video";
+    private String getReadUrlMap = server + "map";
+    private String readUrlRestaurant = server + "restaurant";
+    private String readUrlGallery = server + "image";
+    private String getGalleryImagesUrl = server + "Images/gallery_images.zip";
     private DatabaseHelper db;
-    private ArrayList<Video> videos;
     public DataBaseHandler(Context applicationContext, DatabaseHelper db) {
         this.applicationContext = applicationContext;
         this.db = db;
     }
 
 
-    public void readFromDatabase(){
+    public void readFromDatabase(String code){
 
+        getReadUrlVideo += "?code=" + code;
+        getReadUrlMap += "?code="+code;
+        readUrlRestaurant += "?code="+code;
+        readUrlPath += "?code="+code;
+        getReadUrlCulturalHeritage += "?code="+code;
         requestQueue = Volley.newRequestQueue(applicationContext);
 
-        JsonObjectRequest jsonObjectRequestCountry = new JsonObjectRequest(Request.Method.GET, readUrlCountry, null,
+        InputStreamVolleyRequest galleryImagesDownloadRequest = new InputStreamVolleyRequest(Request.Method.GET, getGalleryImagesUrl,
+
+                new Response.Listener<byte[]>() {
+                    @Override
+                    public void onResponse(byte[] response) {
+
+                        try {
+                            if(response != null) {
+
+                                String savingPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/gallery_images";
+                                File dir = new File(savingPath);
+                                File unzipDir = new File(savingPath + "/gallery_images_unzip");
+
+                                if (!dir.exists())
+                                    dir.mkdir();
+
+                                File imagesSave = new File(dir, "gallery_images.zip");
+                                if(!imagesSave.exists()) {
+
+                                    try {
+
+                                        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(imagesSave));
+                                        bos.write(response);
+                                        bos.flush();
+                                        bos.close();
+
+                                    } catch (Exception e) {
+
+                                    }
+
+                                    unzip(imagesSave, unzipDir);
+
+                                }
+
+                            }
+
+
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                    }
+                }, null);
+
+
+        //Povlačenje tekstualnih podataka za galeriju
+        JsonObjectRequest galleryDataRequest = new JsonObjectRequest(Request.Method.GET, readUrlGallery, null,
 
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        if(db.getAllCountrys().size() == 0)
-                        {
-                            //Toast.makeText(applicationContext, "Drzave" + String.valueOf(db.getAllCountrys().size()), Toast.LENGTH_SHORT).show();
+
+                        if (db.getAllImages().size() == 0) {
+
                             try {
-                                JSONArray speciesJsonArray = response.getJSONArray("Countries");
-                                for (int i = 0; i < speciesJsonArray.length(); i++){
+                                JSONArray galleryDataJsonArray = response.getJSONArray("Images");
+
+                                for (int i = 0; i < galleryDataJsonArray.length(); i++) {
+                                    JSONObject galleryDataJsonObject = galleryDataJsonArray.getJSONObject(i);
+
+                                    String imageName = galleryDataJsonObject.getString("image_name");
+
+                                    db.createImage(new Image(imageName, 0,
+                                            galleryDataJsonObject.getString("title"),
+                                            galleryDataJsonObject.getString("description"),
+                                            galleryDataJsonObject.getString("town_name")));
+
+                                    int a = 2;
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                    }
+                });
+
+        JsonObjectRequest jsonObjectRequestCountry = new JsonObjectRequest(Request.Method.GET, readUrlCountry, null,
+
+        new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray speciesJsonArray = response.getJSONArray("Countries");
+                            if(db.getAllCountrys().size() != speciesJsonArray.length()) {
+                                db.reCreateTableCountry();
+                                for (int i = 0; i < speciesJsonArray.length(); i++) {
                                     JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
                                     db.createCountry(new Country(speciesJsonObject.getInt("id"),
                                             speciesJsonObject.getString("name")));
                                 }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-                        }
-                        else
-                        {
-                            //Toast.makeText(applicationContext, "Baza je vec puna.", Toast.LENGTH_SHORT).show();
+                            else
+                            {
+                                //Toast.makeText(applicationContext, "Baza je ista.", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
                 },
@@ -85,60 +192,24 @@ public class DataBaseHandler {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        if(db.getAllTowns().size() == 0)
-                        {
-                            //Toast.makeText(applicationContext, "Grad" + String.valueOf(db.getAllTowns().size()), Toast.LENGTH_SHORT).show();
                             try {
                                 JSONArray speciesJsonArray = response.getJSONArray("Towns");
-                                for (int i = 0; i < speciesJsonArray.length(); i++){
-                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
-                                    db.createTown(new Town(speciesJsonObject.getInt("id"),
-                                            speciesJsonObject.getInt("id_country"),
-                                            speciesJsonObject.getString("name")));
+                                if(db.getAllTowns().size() != speciesJsonArray.length()) {
+                                    db.reCreateTableTown();
+                                    for (int i = 0; i < speciesJsonArray.length(); i++) {
+                                        JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                        db.createTown(new Town(speciesJsonObject.getInt("id"),
+                                                speciesJsonObject.getInt("id_country"),
+                                                speciesJsonObject.getString("name")));
+                                    }
+                                }
+                                else
+                                {
+                                    //Toast.makeText(applicationContext, "Baza je ista.", Toast.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                        }
-                        else
-                        {
-                            //Toast.makeText(applicationContext, "Baza je vec puna.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                },
-
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                    }
-                });
-
-        JsonObjectRequest jsonObjectRequestTour = new JsonObjectRequest(Request.Method.GET, readUrlTour, null,
-
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        if(db.getAllTours().size() == 0)
-                        {
-                            //Toast.makeText(applicationContext, "Tura" +  String.valueOf(db.getAllTours().size()), Toast.LENGTH_SHORT).show();
-                            try {
-                                JSONArray speciesJsonArray = response.getJSONArray("Tours");
-                                for (int i = 0; i < speciesJsonArray.length(); i++){
-                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
-                                    db.createTour(new Tour(speciesJsonObject.getInt("id"),
-                                            speciesJsonObject.getInt("id_town"),
-                                            speciesJsonObject.getString("name"),
-                                            speciesJsonObject.getString("code")));
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        else
-                        {
-                            //Toast.makeText(applicationContext, "Baza je vec puna.", Toast.LENGTH_SHORT).show();
-                        }
                     }
                 },
 
@@ -154,25 +225,23 @@ public class DataBaseHandler {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        if(db.getAllPaths().size() == 0)
-                        {
-                            //Toast.makeText(applicationContext, "Putanja" + String.valueOf(db.getAllPaths().size()), Toast.LENGTH_SHORT).show();
                             try {
                                 JSONArray speciesJsonArray = response.getJSONArray("Paths");
-                                for (int i = 0; i < speciesJsonArray.length(); i++){
-                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
-                                    db.createPath(new Path(speciesJsonObject.getInt("id"), speciesJsonObject.getInt("id_tour"),
-                                            (float) speciesJsonObject.getDouble("lat"), (float) speciesJsonObject.getDouble("lng"),
-                                            speciesJsonObject.getInt("ind") > 0));
+                                if(db.getAllPaths().size() != speciesJsonArray.length()) {
+                                    db.reCreateTablePath();
+                                    for (int i = 0; i < speciesJsonArray.length(); i++) {
+                                        JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                        db.createPath(new Path(speciesJsonObject.getInt("id"), speciesJsonObject.getInt("id_tour"),
+                                                (float) speciesJsonObject.getDouble("lat"), (float) speciesJsonObject.getDouble("lng")));
+                                    }
+                                }
+                                else
+                                {
+                                    //Toast.makeText(applicationContext, "Baza je ista.", Toast.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
                                     e.printStackTrace();
                             }
-                        }
-                        else
-                        {
-                            //Toast.makeText(applicationContext, "Baza je vec puna.", Toast.LENGTH_SHORT).show();
-                        }
                     }
                 },
 
@@ -188,29 +257,28 @@ public class DataBaseHandler {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        if(db.getAllCulturalHeritages().size() == 0)
-                        {
-                            //Toast.makeText(applicationContext, "Znamenitost" + String.valueOf(db.getAllCulturalHeritages().size()), Toast.LENGTH_SHORT).show();
                             try {
                                 JSONArray speciesJsonArray = response.getJSONArray("CalturalHeritages");
-                                for (int i = 0; i < speciesJsonArray.length(); i++){
-                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
-                                    db.createCulturalHeritage(new CulturalHeritage(speciesJsonObject.getInt("id"),
-                                            speciesJsonObject.getInt("id_town"),
-                                            speciesJsonObject.getInt("id_tour"),
-                                            speciesJsonObject.getString("name"),
-                                            (float) speciesJsonObject.getDouble("lat"),
-                                            (float) speciesJsonObject.getDouble("lng"),
-                                            speciesJsonObject.getString("logo")));
+                                if(db.getAllCulturalHeritages().size() != speciesJsonArray.length()) {
+                                    db.reCreateTableCulturalHeritage();
+                                    for (int i = 0; i < speciesJsonArray.length(); i++) {
+                                        JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                        db.createCulturalHeritage(new CulturalHeritage(speciesJsonObject.getInt("id"),
+                                                speciesJsonObject.getInt("id_tour"),
+                                                speciesJsonObject.getString("name"),
+                                                speciesJsonObject.getString("description"),
+                                                (float) speciesJsonObject.getDouble("lat"),
+                                                (float) speciesJsonObject.getDouble("lng"),
+                                                speciesJsonObject.getString("logo")));
+                                    }
+                                }
+                                else
+                                {
+                                    //Toast.makeText(applicationContext, "Baza je ista"), Toast.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                        }
-                        else
-                        {
-                            //Toast.makeText(applicationContext, "Znamenitost" + String.valueOf(db.getAllCulturalHeritages().size()), Toast.LENGTH_SHORT).show();
-                        }
                     }
                 },
 
@@ -226,60 +294,160 @@ public class DataBaseHandler {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        if(db.getAllVideos().size() == 0)
-                        {
                             try {
                                 JSONArray speciesJsonArray = response.getJSONArray("Videos");
-                                for (int i = 0; i < speciesJsonArray.length(); i++){
-                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
-                                    //Toast.makeText(applicationContext, speciesJsonObject.getString("name"), Toast.LENGTH_SHORT).show();
+                                if(db.getAllVideos().size() != speciesJsonArray.length()) {
+                                    db.reCreateTableVideo();
+                                    for (int i = 0; i < speciesJsonArray.length(); i++) {
+                                        JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                        /*Skidanje fajlova sa servera*/
+                                        final String finalname = speciesJsonObject.getString("name");
+                                        InputStreamVolleyRequest requestFileVideo = new InputStreamVolleyRequest(Request.Method.GET, server + "Videos/" + speciesJsonObject.getString("name"),
+                                                new Response.Listener<byte[]>() {
+                                                    @Override
+                                                    public void onResponse(byte[] response) {
+                                                        // TODO handle the response
+                                                        try {
+                                                            if (response != null) {
 
-                                    /*Skidanje fajlova sa servera*/
-                                    final String finalname = speciesJsonObject.getString("name");
-                                    InputStreamVolleyRequest requestFileVideo = new InputStreamVolleyRequest(Request.Method.GET, server + "Cetinje/" + speciesJsonObject.getString("name"),
-                                            new Response.Listener<byte[]>() {
-                                                @Override
-                                                public void onResponse(byte[] response) {
-                                                    // TODO handle the response
-                                                    try {
-                                                        if (response!=null) {
-
-                                                            FileOutputStream outputStream;
-                                                            String name=finalname;
-                                                            outputStream = applicationContext.openFileOutput(name, Context.MODE_PRIVATE);
-                                                            outputStream.write(response);
-                                                            outputStream.close();
-                                                            Toast.makeText(applicationContext, "Download complete.", Toast.LENGTH_LONG).show();
+                                                                FileOutputStream outputStream;
+                                                                String name = finalname;
+                                                                outputStream = applicationContext.openFileOutput(name, Context.MODE_PRIVATE);
+                                                                outputStream.write(response);
+                                                                outputStream.close();
+                                                            }
+                                                        } catch (Exception e) {
+                                                            // TODO Auto-generated catch block
+                                                            Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                                                            e.printStackTrace();
                                                         }
-                                                    } catch (Exception e) {
-                                                        // TODO Auto-generated catch block
-                                                        Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
-                                                        e.printStackTrace();
                                                     }
-                                                }
-                                            } ,new Response.ErrorListener() {
+                                                }, new Response.ErrorListener() {
 
-                                        @Override
-                                        public void onErrorResponse(VolleyError error) {
-                                            // TODO handle the error
-                                            error.printStackTrace();
-                                        }
-                                    }, null);
-                                    //RequestQueue mRequestQueue = Volley.newRequestQueue(applicationContext, new HurlStack()); //za HTTPS konekciju
-                                    requestQueue.add(requestFileVideo);
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
+                                                // TODO handle the error
+                                                error.printStackTrace();
+                                            }
+                                        }, null);
+                                        //RequestQueue mRequestQueue = Volley.newRequestQueue(applicationContext, new HurlStack()); //za HTTPS konekciju
+                                        requestQueue.add(requestFileVideo);
 
-                                    db.createVideo(new Video(speciesJsonObject.getInt("id"),
-                                            speciesJsonObject.getInt("id_cultural_heritage"),
-                                            speciesJsonObject.getString("name"),
-                                            speciesJsonObject.getInt("ind") > 0));
+                                        db.createVideo(new Video(speciesJsonObject.getInt("id"),
+                                                speciesJsonObject.getInt("id_cultural_heritage"),
+                                                speciesJsonObject.getString("name"),
+                                                speciesJsonObject.getInt("ind") > 0));
+                                    }
+                                }
+                                else
+                                {
+                                    //Toast.makeText(applicationContext, "Znamenitost" + String.valueOf(db.getAllCulturalHeritages().size()), Toast.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("VOLLEY", error.getMessage());
+                    }
+                });
+
+
+        JsonObjectRequest jsonObjectRequestMap = new JsonObjectRequest(Request.Method.GET, getReadUrlMap, null,
+
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray speciesJsonArray = response.getJSONArray("Town");
+                            for (int i = 0; i < speciesJsonArray.length(); i++) {
+                                JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                InputStreamVolleyRequest requestFileMap = new InputStreamVolleyRequest(Request.Method.GET, server + "Maps/" +speciesJsonObject.getString("name") + "/Mapa.zip",
+                                        new Response.Listener<byte[]>() {
+                                            @Override
+                                            public void onResponse(byte[] response) {
+                                                // TODO handle the response
+                                                try {
+                                                    if (response!=null) {
+                                                        String savingPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/osmdroid";
+                                                        File dir = new File(savingPath);
+                                                        if (!dir.exists())
+                                                            dir.mkdir();
+                                                        File mapSave = new File(dir, "Mapa.zip");
+                                                        if(!mapSave.exists())
+                                                        {
+                                                            try {
+                                                                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(mapSave));
+                                                                bos.write(response);
+                                                                bos.flush();
+                                                                bos.close();
+                                                                //Toast.makeText(applicationContext, "Download complete.", Toast.LENGTH_LONG).show();
+                                                            } catch (Exception e) {
+                                                            }
+                                                        }
+                                                    }
+                                                } catch (Exception e) {
+                                                    // TODO Auto-generated catch block
+                                                    Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        } ,new Response.ErrorListener() {
+
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        // TODO handle the error
+                                        error.printStackTrace();
+                                    }
+                                }, null);
+                                requestQueue.add(requestFileMap);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        else
-                        {
-                            //Toast.makeText(applicationContext, "Znamenitost" + String.valueOf(db.getAllCulturalHeritages().size()), Toast.LENGTH_SHORT).show();
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                    }
+                });
+
+        //popunjavanje restorana
+        JsonObjectRequest jsonObjectRestaurant = new JsonObjectRequest(Request.Method.GET, readUrlRestaurant, null,
+
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray speciesJsonArray = response.getJSONArray("Restaurants");
+                            if(db.getAllRestaurants().size() != speciesJsonArray.length()) {
+                                db.reCreateTableRestaurant();
+                                for (int i = 0; i < speciesJsonArray.length(); i++){
+                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                    db.createRestaurant(new Restaurant(speciesJsonObject.getInt("id"),
+                                            speciesJsonObject.getInt("id_town"),
+                                            speciesJsonObject.getString("name"),
+                                            speciesJsonObject.getString("description"),
+                                            speciesJsonObject.getInt("discount"),
+                                            (float) speciesJsonObject.getDouble("lat"),
+                                            (float) speciesJsonObject.getDouble("lng"),
+                                            speciesJsonObject.getString("logo")
+                                    ));
+                                }
+                            }
+                            else
+                            {
+                                //Toast.makeText(applicationContext, "Baza je vec puna.", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e("greska", e.getMessage());
                         }
                     }
                 },
@@ -291,67 +459,95 @@ public class DataBaseHandler {
                     }
                 });
 
-        InputStreamVolleyRequest requestFileMap = new InputStreamVolleyRequest(Request.Method.GET, server + "Cetinje/mapa/Mapa.zip",
-                new Response.Listener<byte[]>() {
-                    @Override
-                    public void onResponse(byte[] response) {
-                        // TODO handle the response
-                        try {
-                            if (response!=null) {
 
-
-                                String savingPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/osmdroid";
-                                File dir = new File(savingPath);
-
-                                if (!dir.exists())
-                                    dir.mkdir();
-
-
-
-                                File mapSave = new File(dir, "Mapa.zip");
-                                if(!mapSave.exists())
-                                {
-                                    try {
-
-                                        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(mapSave));
-                                        bos.write(response);
-                                        bos.flush();
-                                        bos.close();
-                                        //Toast.makeText(applicationContext, "Download complete.", Toast.LENGTH_LONG).show();
-                                    } catch (Exception e) {
-
-                                    }
-                                }
-                            }
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
-                            e.printStackTrace();
-                        }
-                    }
-                } ,new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // TODO handle the error
-                error.printStackTrace();
-            }
-        }, null);
         //RequestQueue mRequestQueue = Volley.newRequestQueue(applicationContext, new HurlStack()); //za HTTPS konekciju
-        requestQueue.add(requestFileMap);
-
-
         requestQueue.add(jsonObjectRequestCountry);
         requestQueue.add(jsonObjectRequestTown);
-        requestQueue.add(jsonObjectRequestTour);
         requestQueue.add(jsonObjectRequestPath);
         requestQueue.add(jsonObjectRequestCulturalHeritage);
         requestQueue.add(jsonObjectRequestVideo);
+        requestQueue.add(jsonObjectRequestMap);
+        requestQueue.add(jsonObjectRestaurant);
+        requestQueue.add(galleryImagesDownloadRequest);
+        requestQueue.add(galleryDataRequest);
+    }
 
+    public void getTour(){
+        requestQueue = Volley.newRequestQueue(applicationContext);
+        JsonObjectRequest jsonObjectRequestTour = new JsonObjectRequest(Request.Method.GET, readUrlTour, null,
+
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray speciesJsonArray = response.getJSONArray("Tours");
+                            if(db.getAllTours().size() != speciesJsonArray.length()) {
+                                db.reCreateTableTour();
+                                for (int i = 0; i < speciesJsonArray.length(); i++) {
+                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                    db.createTour(new Tour(speciesJsonObject.getInt("id"),
+                                            speciesJsonObject.getInt("id_town"),
+                                            speciesJsonObject.getString("name"),
+                                            speciesJsonObject.getString("code"),
+                                            speciesJsonObject.getInt("ind") > 0));
+                                }
+                            }
+                            else
+                            {
+                                //Toast.makeText(applicationContext, "Baza je ista.", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+        requestQueue.add(jsonObjectRequestTour);
     }
 
     public void insertIntoDatabase(){
 
         requestQueue = Volley.newRequestQueue(applicationContext);
+    }
+
+    public static void unzip(File zipFile, File targetDirectory) throws IOException {
+
+        ZipInputStream zipInputStream = new ZipInputStream( new BufferedInputStream( new FileInputStream(zipFile) ) );
+
+        try {
+
+            ZipEntry zipEntry;
+            int count;
+
+            byte[] buffer = new byte[8192];
+
+            if (!targetDirectory.exists())
+                targetDirectory.mkdir();
+
+            while( (zipEntry = zipInputStream.getNextEntry()) != null ) {
+
+                File file = new File(targetDirectory, zipEntry.getName());
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+                try {
+                    while ( (count = zipInputStream.read(buffer)) != -1 ) {
+                        fileOutputStream.write(buffer, 0, count);
+                    }
+                } finally {
+                    fileOutputStream.close();
+                }
+
+            }
+
+        } finally{
+            zipInputStream.close();
+        }
+
     }
 }

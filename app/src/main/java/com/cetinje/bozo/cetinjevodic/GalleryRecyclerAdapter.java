@@ -3,6 +3,7 @@ package com.cetinje.bozo.cetinjevodic;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -20,6 +22,8 @@ class GalleryRecyclerAdapter extends RecyclerView.Adapter{
 
     public static ArrayList<Image> PAGER_IMAGES = new ArrayList<>();
     public static int CLICKED_POSITION;
+
+    public static String galleryImagesDirectory;
 
     private ArrayList<City> cities = new ArrayList<>();
     private Context context;
@@ -29,6 +33,7 @@ class GalleryRecyclerAdapter extends RecyclerView.Adapter{
         this.cities = cities;
         this.context = context;
         formDataList();
+        galleryImagesDirectory = Environment.getExternalStorageDirectory().getAbsolutePath() + "/gallery_images/gallery_images_unzip/";
     }
 
     public ArrayList<Object> getGalleryData() {
@@ -42,9 +47,9 @@ class GalleryRecyclerAdapter extends RecyclerView.Adapter{
         if (data.get(position) instanceof City) {
             City currentCity = (City) data.get(position);
             ((SectionViewHolder) holder).title.setText(currentCity.getName());
-            Glide.with(context).load(currentCity.getPictures().get(0).getId()).into(((SectionViewHolder) holder).imageView);
+            Glide.with(context).load( new File(galleryImagesDirectory + currentCity.getPictures().get(0).getImageName()) ).into(((SectionViewHolder) holder).imageView);
         } else {
-            Glide.with(context).load(((Image) data.get(position)).getId()).into(((GalleryViewHolder) holder).imageView);
+            Glide.with(context).load( new File(galleryImagesDirectory + ((Image) data.get(position)).getImageName()) ).into(((GalleryViewHolder) holder).imageView);
             ((GalleryViewHolder) holder).boundedImageObject = (Image) data.get(position);
         }
 

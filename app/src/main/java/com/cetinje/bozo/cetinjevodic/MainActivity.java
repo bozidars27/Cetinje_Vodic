@@ -24,6 +24,8 @@ import android.widget.Toast;
 import android.Manifest;
 import com.bumptech.glide.Glide;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
     ImageView background;
     ImageView banner;
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     DatabaseHelper db; // Lokalna baza
     DataBaseHandler dbH; //Sinhronizacija sa serverskom bazom
 
+    public static final String BarcodeObject = "Barcode";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,16 +60,15 @@ public class MainActivity extends AppCompatActivity {
 
         db = new DatabaseHelper(getApplicationContext());
         dbH = new DataBaseHandler(getApplicationContext(), db);
-        dbH.readFromDatabase();
+        Intent intent = getIntent();
+        //Toast.makeText(getApplicationContext(), String.valueOf(intent.getStringExtra(BarcodeObject)), Toast.LENGTH_SHORT).show();
+        if(!intent.getStringExtra(BarcodeObject).equals("0"))
+        {
+            //Toast.makeText(getApplicationContext(), String.valueOf(intent.getStringExtra(BarcodeObject)), Toast.LENGTH_SHORT).show();
+            dbH.readFromDatabase(intent.getStringExtra(BarcodeObject));
+        }
         //Toast.makeText(getApplicationContext(), String.valueOf(db.getAllCountrys().size()), Toast.LENGTH_SHORT).show();
 
-        //Trazenje dozvole da se pristupi EXTERNAL STORAGE-u i Lokaciji
-        int PERMISSION_ALL = 1;
-        String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION};
-
-        if(!hasPermissions(this, PERMISSIONS)){
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
-        }
 
         background = (ImageView) findViewById(R.id.bg);
         banner = (ImageView) findViewById(R.id.banner);
@@ -200,41 +203,27 @@ public class MainActivity extends AppCompatActivity {
                     }, 400);
 
                 }
+                else if (event.getAction() == MotionEvent.ACTION_UP && currentlyUp == restaurants){
+
+                    (new Handler()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent i = new Intent(getBaseContext(), RestaurantActivity.class);
+                            startActivity(i);
+                        }
+                    }, 400);
+
+                }
                 return true;
             }
         });
 
     }
 
-    public static boolean hasPermissions(Context context, String... permissions) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private Boolean exit = false;
     @Override
     public void onBackPressed() {
-        if (exit) {
-            finish();
-        } else {
-            Toast.makeText(this, "Press Back again to Exit.",
-                    Toast.LENGTH_SHORT).show();
-            exit = true;
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    exit = false;
-                }
-            }, 3 * 1000);
-
-        }
-
+        Intent i = new Intent(this, QRcodeActivity.class);
+        startActivity(i);
     }
 
     @Override

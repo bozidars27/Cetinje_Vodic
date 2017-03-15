@@ -42,6 +42,8 @@ public class MapActivity extends Activity implements MapEventsReceiver {
     private ArrayList<Path> paths;
     private ArrayList<CulturalHeritage> cultural_heritages;
 
+    public static final String BarcodeObject = "Barcode";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -251,6 +253,7 @@ public class MapActivity extends Activity implements MapEventsReceiver {
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra("EXIT", true);
+                        intent.putExtra(BarcodeObject, "0");
                         startActivity(intent);
                     }
                 })

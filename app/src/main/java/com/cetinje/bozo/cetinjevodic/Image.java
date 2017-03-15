@@ -5,7 +5,7 @@ package com.cetinje.bozo.cetinjevodic;
  */
 
 public class Image {
-    int id;
+    String imageName;
     int id_cultural_heritage;
     String name;
     String description;
@@ -14,8 +14,8 @@ public class Image {
     public Image() {
     }
 
-    public Image(int id, int id_cultural_heritage, String name, String description, String cityName) {
-        this.id = id;
+    public Image(String imageName, int id_cultural_heritage, String name, String description, String cityName) {
+        this.imageName = imageName;
         this.id_cultural_heritage = id_cultural_heritage;
         this.name = name;
         this.description = description;
@@ -23,8 +23,8 @@ public class Image {
 
     }
 
-    public int getId() {
-        return id;
+    public String getImageName() {
+        return imageName;
     }
 
     public int getId_cultural_heritage() {
@@ -43,8 +43,8 @@ public class Image {
         return cityName;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     public void setId_cultural_heritage(int id_cultural_heritage) {

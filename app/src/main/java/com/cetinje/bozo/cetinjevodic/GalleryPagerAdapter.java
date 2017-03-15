@@ -1,6 +1,7 @@
 package com.cetinje.bozo.cetinjevodic;
 
 import android.content.Context;
+import android.os.Environment;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +12,18 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.io.File;
+
 
 public class GalleryPagerAdapter extends PagerAdapter {
 
     Context context;
     LayoutInflater layoutInflater;
+    public static String galleryImagesDirectory;
 
     public GalleryPagerAdapter(Context context) {
         this.context = context;
+        galleryImagesDirectory = Environment.getExternalStorageDirectory().getAbsolutePath() + "/gallery_images/gallery_images_unzip/";
     }
 
     @Override
@@ -41,7 +46,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
         ImageView imageView = (ImageView) view.findViewById(R.id.image_view);
         final TextView textView = (TextView) view.findViewById(R.id.text_view);
 
-        Glide.with(context).load( GalleryRecyclerAdapter.PAGER_IMAGES.get(position).getId()).into(imageView);
+        Glide.with(context).load( new File(galleryImagesDirectory + GalleryRecyclerAdapter.PAGER_IMAGES.get(position).getImageName()) ).into(imageView);
         textView.setText( GalleryRecyclerAdapter.PAGER_IMAGES.get(position).getName());
 
         container.addView(view);

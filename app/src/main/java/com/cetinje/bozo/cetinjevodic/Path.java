@@ -9,17 +9,15 @@ public class Path {
     int id_tour;
     float lat;
     float lng;
-    boolean ind;
 
     public Path() {
     }
 
-    public Path(int id, int id_tour, float lat, float lng, boolean ind) {
+    public Path(int id, int id_tour, float lat, float lng) {
         this.id = id;
         this.id_tour = id_tour;
         this.lat = lat;
         this.lng = lng;
-        this.ind = ind;
     }
 
     public int getId() {
@@ -38,10 +36,6 @@ public class Path {
         return lng;
     }
 
-    public boolean isInd() {
-        return ind;
-    }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -56,9 +50,5 @@ public class Path {
 
     public void setLng(float lng) {
         this.lng = lng;
-    }
-
-    public void setInd(boolean ind) {
-        this.ind = ind;
     }
 }
