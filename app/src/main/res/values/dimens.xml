@@ -32,7 +32,7 @@
     <dimen name="description_font">18sp</dimen>
     <dimen name="description_padding_top">25dp</dimen>
     <dimen name="description_padding_horizontal">50dp</dimen>
-
+    <dimen name="fab_margin">16dp</dimen>
 
 
 </resources>
