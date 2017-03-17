@@ -241,8 +241,8 @@ public class MainActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-        animateIt(route, null, true);
-        currentlyUp = route;
+        //animateIt(route, null, true);
+        //currentlyUp = route;
 
         //Dinamicko postavljanje margina
         int iconMargHor = getHorMargins();

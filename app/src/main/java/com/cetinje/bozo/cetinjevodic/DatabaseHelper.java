@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -149,7 +150,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_FEEDBACK = "CREATE TABLE "
             + TABLE_FEEDBACK + "(" + KEY_ID + " INTEGER PRIMARY KEY, "
             + KEY_ID_RESTAURANT + " INTEGER, "
-            + KEY_MARK + " INTEGER"
+            + KEY_MARK + " INTEGER, "
             + KEY_IMPRESSION + " TEXT, "
             + " FOREIGN KEY ("+KEY_ID_RESTAURANT+") REFERENCES " + TABLE_RESTAURANT + "(" +KEY_ID +"))";
 
@@ -484,6 +485,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return paths;
     }
 
+    public float createFeedback(Feedback feedback) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, feedback.getId());
+        values.put(KEY_ID_RESTAURANT, feedback.id_restaurant);
+        values.put(KEY_MARK, feedback.getMark());
+        values.put(KEY_IMPRESSION, feedback.getImpression());
+
+        // insert row
+        float feedback_id = db.insert(TABLE_FEEDBACK, null, values);
+
+        return feedback_id;
+    }
+
+    public ArrayList<Feedback> getAllFeedbacks() {
+        ArrayList<Feedback> feedbacks = new ArrayList<>();
+        String selectQuery = "SELECT  * FROM " + TABLE_FEEDBACK;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Feedback feedback = new Feedback(c.getInt((c.getColumnIndex(KEY_ID))), c.getInt(c.getColumnIndex(KEY_ID_RESTAURANT)),
+                        c.getInt(c.getColumnIndex(KEY_MARK)), c.getString(c.getColumnIndex(KEY_IMPRESSION)));
+
+                // adding to todo list
+                feedbacks.add(feedback);
+            } while (c.moveToNext());
+        }
+        return feedbacks;
+    }
+
     public float createCulturalHeritage(CulturalHeritage cultural_heritage) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -620,27 +656,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //vraca -1 ako nije upisao
         return restaurant_id;
     }
-    //
-    public ArrayList<String> getAllRestaurantsName() {
-        ArrayList<String> restaurants = new ArrayList<String>();
-        String selectQuery = "SELECT  " + KEY_NAME + " FROM " + TABLE_RESTAURANT;
 
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
-        if (c.moveToFirst()) {
-            do {
-                // adding to todo list
-                restaurants.add(c.getString(c.getColumnIndex(KEY_NAME)));
-            } while (c.moveToNext());
-        }
-        return restaurants;
-    }
     //lista restorana iz lokalne baze
     public ArrayList<Restaurant> getAllRestaurants() {
-        ArrayList<Restaurant> restaurants = new ArrayList<Restaurant>();
-        String selectQuery = "SELECT  * FROM " + TABLE_RESTAURANT;
+        ArrayList<Restaurant> restaurants = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_RESTAURANT;
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
@@ -648,6 +668,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
+                String selectQueryFeedback = "SELECT * FROM " + TABLE_FEEDBACK + " WHERE " + KEY_ID_RESTAURANT + " = " + c.getInt(c.getColumnIndex(KEY_ID));
+                Cursor cFeedback = db.rawQuery(selectQueryFeedback, null);
+                ArrayList<Feedback> feedbacks = new ArrayList<>();
+                if (cFeedback.moveToFirst()) {
+                    do {
+                        feedbacks.add(new Feedback(cFeedback.getInt(cFeedback.getColumnIndex(KEY_ID)),
+                                cFeedback.getInt(cFeedback.getColumnIndex(KEY_ID_RESTAURANT)),
+                                cFeedback.getInt(cFeedback.getColumnIndex(KEY_MARK)),
+                                cFeedback.getString(cFeedback.getColumnIndex(KEY_IMPRESSION))));
+                    } while (cFeedback.moveToNext());
+                }
                 Restaurant restaurant = new Restaurant(c.getInt(c.getColumnIndex(KEY_ID)),
                         c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
                         c.getString(c.getColumnIndex(KEY_NAME)),
@@ -655,6 +686,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         c.getInt(c.getColumnIndex(KEY_DISCOUNT)),
                         c.getFloat(c.getColumnIndex(KEY_LAT)),
                         c.getFloat(c.getColumnIndex(KEY_LNG)),
+                        feedbacks,
                         c.getString(c.getColumnIndex(KEY_LOGO)));
 
                 // adding to todo list
@@ -662,6 +694,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
         return restaurants;
+    }
+
+    public Restaurant getSpecificRestaurants(int id) {
+        Restaurant restaurant;
+        String selectQueryFeedback = "SELECT * FROM " + TABLE_FEEDBACK + " WHERE " + KEY_ID_RESTAURANT + " = " + id;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cFeedback = db.rawQuery(selectQueryFeedback, null);
+        ArrayList<Feedback> feedbacks = new ArrayList<>();
+        if (cFeedback.moveToFirst()) {
+            do {
+                feedbacks.add(new Feedback(cFeedback.getInt(cFeedback.getColumnIndex(KEY_ID)),
+                        cFeedback.getInt(cFeedback.getColumnIndex(KEY_ID_RESTAURANT)),
+                        cFeedback.getInt(cFeedback.getColumnIndex(KEY_MARK)),
+                        cFeedback.getString(cFeedback.getColumnIndex(KEY_IMPRESSION))));
+            } while (cFeedback.moveToNext());
+        }
+        String selectQuery = "SELECT * FROM " + TABLE_RESTAURANT + " WHERE " + KEY_ID + " = " + id;
+        Cursor c = db.rawQuery(selectQuery, null);
+        c.moveToFirst();
+        restaurant = new Restaurant(c.getInt(c.getColumnIndex(KEY_ID)),
+                c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
+                c.getString(c.getColumnIndex(KEY_NAME)),
+                c.getString(c.getColumnIndex(KEY_DESCRIPTION)),
+                c.getInt(c.getColumnIndex(KEY_DISCOUNT)),
+                c.getFloat(c.getColumnIndex(KEY_LAT)),
+                c.getFloat(c.getColumnIndex(KEY_LNG)),
+                feedbacks,
+                c.getString(c.getColumnIndex(KEY_LOGO)));
+        // looping through all rows and adding to list
+        return restaurant;
     }
 
     public double createEvent(Events even) {

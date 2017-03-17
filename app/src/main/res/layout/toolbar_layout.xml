@@ -15,6 +15,7 @@
         android:text="@string/gallery_toolbar"
         android:textColor="@android:color/white"
         android:textSize="@dimen/gallery_font"
-        android:gravity="center_vertical" />
+        android:gravity="center_vertical"
+        android:id="@+id/app_title"/>
 
 </android.support.v7.widget.Toolbar>

@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,46 +20,27 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class RestaurantActivity extends AppCompatActivity {
-
-
-    //deklarisanje polja
-    TextView polje1;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
     private DatabaseHelper db;
-    private ArrayList<String> restaurants;
-    /*String[] mobileArray = {"Android","IPhone","WindowsMobile","Blackberry",
-            "WebOS","Ubuntu","Windows7","Max OS X","Android","IPhone","WindowsMobile","Blackberry",
-            "WebOS","Ubuntu","Windows7","Max OS X","Android","IPhone","WindowsMobile","Blackberry",
-            "WebOS","Ubuntu","Windows7","Max OS X"};*/
+    private ArrayList<Restaurant> restaurants;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
-
-
-
-
-        polje1 = (TextView) findViewById(R.id.textEdit1);
+        textView = (TextView) findViewById(R.id.app_title);
+        textView.setText(getResources().getString(R.string.restaurant_title));
         db = new DatabaseHelper(getApplicationContext());
-        restaurants = db.getAllRestaurantsName();
-        if(restaurants.size() == 0)
-        {
-            polje1.setText("Nema restorana");
-        }
-
-        ArrayAdapter adapter = new ArrayAdapter<String>(this,
-                R.layout.content_restaurant, restaurants);
-
-        ListView listView = (ListView) findViewById(R.id.list_restaurant);
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // When clicked, show a toast with the TextView text
-                Toast.makeText(getApplicationContext(),
-                        ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        restaurants = db.getAllRestaurants();
+        recyclerView = (RecyclerView) findViewById(R.id.restaurant_recycler_view);
+        adapter = new RestaurantRecyclerAdapter(restaurants, getApplicationContext());
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapter);
     }
 
 }

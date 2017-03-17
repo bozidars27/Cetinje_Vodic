@@ -37,7 +37,8 @@
             android:name=".barcode.BarcodeCaptureActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".RestaurantActivity" />
-        <activity android:name=".EventActivity"></activity>
+        <activity android:name=".EventActivity" />
+        <activity android:name=".RestaurantPagerActivity"></activity>
     </application>
 
 </manifest>

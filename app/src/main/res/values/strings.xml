@@ -8,6 +8,10 @@
     <string name="gallery_toolbar">Galerija</string>
     <string name="title_activity_restaurant">RestaurantActivity</string>
 
+    <!-- Restorani -->
+    <string name="restaurant_title">Restorani</string>
+    <string name="restaurant_description">Opis:</string>
+
     <!-- Strings related to MainActivity-->
     <string name="scan_barcode_button">Scan barcode</string>
     <string name="open_app_button">Open App</string>

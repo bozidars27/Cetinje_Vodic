@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,8 +31,8 @@ public class DataBaseHandler {
 
     Context applicationContext;
     //private String server = "http://192.168.100.3/";
-    private String server = "http://89.188.33.189/";
-    //private String server = "http://192.168.0.105/";
+    //private String server = "http://89.188.33.189/";
+    private String server = "http://192.168.100.5/";
 
     private RequestQueue requestQueue;
     private String readUrlCountry = server + "countries";
@@ -45,6 +46,8 @@ public class DataBaseHandler {
     private String readUrlEvents = server + "events";
     private String readUrlGallery = server + "image";
     private String getGalleryImagesUrl = server + "Images/gallery_images.zip";
+    private String getLogoImagesUrl = server + "Logos/Logos.zip";
+    private String getFeedbacksUrl = server + "feedback";
     private DatabaseHelper db;
     public DataBaseHandler(Context applicationContext, DatabaseHelper db) {
         this.applicationContext = applicationContext;
@@ -60,7 +63,56 @@ public class DataBaseHandler {
         readUrlPath += "?code="+code;
         getReadUrlCulturalHeritage += "?code="+code;
         readUrlEvents += "?code="+code;
+        getFeedbacksUrl += "?code="+code;
         requestQueue = Volley.newRequestQueue(applicationContext);
+
+
+        InputStreamVolleyRequest logoImagesDownloadRequest = new InputStreamVolleyRequest(Request.Method.GET, getLogoImagesUrl,
+
+                new Response.Listener<byte[]>() {
+                    @Override
+                    public void onResponse(byte[] response) {
+
+                        try {
+                            if(response != null) {
+                                String savingPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/logo_images";
+                                File dir = new File(savingPath);
+                                if (!dir.exists())
+                                    dir.mkdir();
+                                File imagesSave = new File(dir, "logo_images.zip");
+                                if(!imagesSave.exists()) {
+
+                                    try {
+                                        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(imagesSave));
+                                        bos.write(response);
+                                        bos.flush();
+                                        bos.close();
+
+                                    } catch (Exception e) {
+                                    }
+                                    unzipPrivate(imagesSave, applicationContext);
+
+                                }
+
+                            }
+
+
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                    }
+                }, null);
+
 
         InputStreamVolleyRequest galleryImagesDownloadRequest = new InputStreamVolleyRequest(Request.Method.GET, getGalleryImagesUrl,
 
@@ -212,6 +264,42 @@ public class DataBaseHandler {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+
+
+
+        JsonObjectRequest jsonObjectRequestFeedback = new JsonObjectRequest(Request.Method.GET, getFeedbacksUrl, null,
+
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray speciesJsonArray = response.getJSONArray("Feedback");
+                            if(db.getAllFeedbacks().size() != speciesJsonArray.length()) {
+                                db.reCreateTableFeedback();
+                                for (int i = 0; i < speciesJsonArray.length(); i++) {
+                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                    db.createFeedback(new Feedback(speciesJsonObject.getInt("id"),
+                                            speciesJsonObject.getInt("id_restaurant"),
+                                            speciesJsonObject.getInt("mark"),
+                                            speciesJsonObject.getString("impression")));
+                                }
+                            }
+                            else
+                            {
+                                //Toast.makeText(applicationContext, "Baza je ista.", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 },
 
@@ -439,6 +527,7 @@ public class DataBaseHandler {
                                             speciesJsonObject.getInt("discount"),
                                             (float) speciesJsonObject.getDouble("lat"),
                                             (float) speciesJsonObject.getDouble("lng"),
+                                            null,
                                             speciesJsonObject.getString("logo")
                                     ));
                                 }
@@ -511,6 +600,9 @@ public class DataBaseHandler {
         requestQueue.add(jsonObjectEvent);
         requestQueue.add(galleryImagesDownloadRequest);
         requestQueue.add(galleryDataRequest);
+        requestQueue.add(logoImagesDownloadRequest);
+        requestQueue.add(jsonObjectRequestFeedback);
+
     }
 
     public void getTour(){
@@ -588,6 +680,38 @@ public class DataBaseHandler {
 
         } finally{
             zipInputStream.close();
+        }
+
+    }
+
+    public static void unzipPrivate(File zipFile, Context applicationContext) throws IOException {
+        ZipInputStream zipInputStream = new ZipInputStream( new BufferedInputStream( new FileInputStream(zipFile) ) );
+
+        try {
+
+            ZipEntry zipEntry;
+            int count;
+
+            byte[] buffer = new byte[8192];
+
+            while( (zipEntry = zipInputStream.getNextEntry()) != null ) {
+
+                String name = zipEntry.getName();
+                FileOutputStream fileOutputStream = applicationContext.openFileOutput(name, Context.MODE_PRIVATE);
+
+                try {
+                    while ( (count = zipInputStream.read(buffer)) != -1 ) {
+                        fileOutputStream.write(buffer, 0, count);
+                    }
+                } finally {
+                    fileOutputStream.close();
+                }
+
+            }
+
+        } finally{
+            zipInputStream.close();
+            //FileUtils.deleteDirectory(zipFile);
         }
 
     }

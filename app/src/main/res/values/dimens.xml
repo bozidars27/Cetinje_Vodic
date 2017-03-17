@@ -34,5 +34,9 @@
     <dimen name="description_padding_horizontal">50dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
+    <!-- Restorani -->
+    <dimen name="title_restaurant_top">10dp</dimen>
+    <dimen name="title_restaurant_left">5dp</dimen>
+
 
 </resources>

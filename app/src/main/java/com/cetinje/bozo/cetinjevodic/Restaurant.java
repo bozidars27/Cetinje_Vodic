@@ -1,5 +1,9 @@
 package com.cetinje.bozo.cetinjevodic;
 
+import android.util.Log;
+
+import java.util.ArrayList;
+
 /**
  * Created by Petar on 2/11/2017.
  */
@@ -12,11 +16,13 @@ public class Restaurant {
     int discount;
     float lat;
     float lng;
+    ArrayList<Feedback> feedbacks;
     String logo; // putanja do loga
 
     public Restaurant() {
     }
-    public Restaurant(int id, int id_town, String name, String description, int discount, float lat, float lng, String logo) {
+
+    public Restaurant(int id, int id_town, String name, String description, int discount, float lat, float lng, ArrayList<Feedback> feedbacks, String logo) {
         this.id = id;
         this.id_town = id_town;
         this.name = name;
@@ -24,6 +30,7 @@ public class Restaurant {
         this.discount = discount;
         this.lat = lat;
         this.lng = lng;
+        this.feedbacks = feedbacks;
         this.logo = logo;
     }
 
@@ -59,6 +66,14 @@ public class Restaurant {
         this.description = description;
     }
 
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
+    }
+
     public float getLat() {
         return lat;
     }
@@ -75,12 +90,12 @@ public class Restaurant {
         this.lng = lng;
     }
 
-    public int getDiscount() {
-        return discount;
+    public ArrayList<Feedback> getFeedbacks() {
+        return feedbacks;
     }
 
-    public void setDiscount(int discount) {
-        this.discount = discount;
+    public void setFeedbacks(ArrayList<Feedback> feedbacks) {
+        this.feedbacks = feedbacks;
     }
 
     public String getLogo() {
@@ -89,5 +104,14 @@ public class Restaurant {
 
     public void setLogo(String logo) {
         this.logo = logo;
+    }
+
+    public float getAverageMark(){
+        float sum = 0;
+        for(Feedback f:this.feedbacks)
+        {
+            sum += f.getMark();
+        }
+        return (this.feedbacks.size()!=0) ? sum/this.feedbacks.size():0;
     }
 }
