@@ -214,6 +214,17 @@ public class MainActivity extends AppCompatActivity {
                     }, 400);
 
                 }
+                else if (event.getAction() == MotionEvent.ACTION_UP && currentlyUp == news){
+
+                    (new Handler()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent i = new Intent(getBaseContext(), EventActivity.class);
+                            startActivity(i);
+                        }
+                    }, 400);
+
+                }
                 return true;
             }
         });

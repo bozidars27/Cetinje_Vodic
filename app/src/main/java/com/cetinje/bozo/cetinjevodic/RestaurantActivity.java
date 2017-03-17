@@ -23,7 +23,6 @@ public class RestaurantActivity extends AppCompatActivity {
     TextView polje1;
     private DatabaseHelper db;
     private ArrayList<String> restaurants;
-    private ArrayList<Country> can;
     /*String[] mobileArray = {"Android","IPhone","WindowsMobile","Blackberry",
             "WebOS","Ubuntu","Windows7","Max OS X","Android","IPhone","WindowsMobile","Blackberry",
             "WebOS","Ubuntu","Windows7","Max OS X","Android","IPhone","WindowsMobile","Blackberry",

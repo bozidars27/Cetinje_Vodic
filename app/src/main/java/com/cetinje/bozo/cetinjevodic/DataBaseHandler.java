@@ -30,8 +30,8 @@ public class DataBaseHandler {
 
     Context applicationContext;
     //private String server = "http://192.168.100.3/";
-    //private String server = "http://89.188.33.100/";
-    private String server = "http://192.168.0.105/";
+    private String server = "http://89.188.33.189/";
+    //private String server = "http://192.168.0.105/";
 
     private RequestQueue requestQueue;
     private String readUrlCountry = server + "countries";
@@ -42,6 +42,7 @@ public class DataBaseHandler {
     private String getReadUrlVideo = server + "video";
     private String getReadUrlMap = server + "map";
     private String readUrlRestaurant = server + "restaurant";
+    private String readUrlEvents = server + "events";
     private String readUrlGallery = server + "image";
     private String getGalleryImagesUrl = server + "Images/gallery_images.zip";
     private DatabaseHelper db;
@@ -58,6 +59,7 @@ public class DataBaseHandler {
         readUrlRestaurant += "?code="+code;
         readUrlPath += "?code="+code;
         getReadUrlCulturalHeritage += "?code="+code;
+        readUrlEvents += "?code="+code;
         requestQueue = Volley.newRequestQueue(applicationContext);
 
         InputStreamVolleyRequest galleryImagesDownloadRequest = new InputStreamVolleyRequest(Request.Method.GET, getGalleryImagesUrl,
@@ -459,6 +461,44 @@ public class DataBaseHandler {
                     }
                 });
 
+        //popunjavanje dogadjaja
+        JsonObjectRequest jsonObjectEvent = new JsonObjectRequest(Request.Method.GET, readUrlEvents, null,
+
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray speciesJsonArray = response.getJSONArray("Events");
+                            if(db.getAllEvents().size() != speciesJsonArray.length()) {
+                                db.reCreateTableEvent();
+                                for (int i = 0; i < speciesJsonArray.length(); i++){
+                                    JSONObject speciesJsonObject = speciesJsonArray.getJSONObject(i);
+                                    db.createEvent(new Events(speciesJsonObject.getInt("id"),
+                                            speciesJsonObject.getInt("id_town"),
+                                            speciesJsonObject.getString("name"),
+                                            speciesJsonObject.getString("description"),
+                                            speciesJsonObject.getString("date_time")
+                                    ));
+                                }
+                            }
+                            else
+                            {
+                                //Toast.makeText(applicationContext, "Baza je vec puna.", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e("greska", e.getMessage());
+                        }
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+
 
         //RequestQueue mRequestQueue = Volley.newRequestQueue(applicationContext, new HurlStack()); //za HTTPS konekciju
         requestQueue.add(jsonObjectRequestCountry);
@@ -468,6 +508,7 @@ public class DataBaseHandler {
         requestQueue.add(jsonObjectRequestVideo);
         requestQueue.add(jsonObjectRequestMap);
         requestQueue.add(jsonObjectRestaurant);
+        requestQueue.add(jsonObjectEvent);
         requestQueue.add(galleryImagesDownloadRequest);
         requestQueue.add(galleryDataRequest);
     }

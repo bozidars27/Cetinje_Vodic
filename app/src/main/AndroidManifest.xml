@@ -16,12 +16,13 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!--android:name="android.support.multidex.MultiDexApplication">-->
+
+        <!-- android:name="android.support.multidex.MultiDexApplication"> -->
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />
 
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
         <activity android:name=".MapActivity" />
         <activity android:name=".Gallery" />
         <activity android:name=".GalleryPager" />
@@ -32,9 +33,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".barcode.BarcodeCaptureActivity"
+        <activity
+            android:name=".barcode.BarcodeCaptureActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity android:name=".RestaurantActivity"></activity>
+        <activity android:name=".RestaurantActivity" />
+        <activity android:name=".EventActivity"></activity>
     </application>
 
 </manifest>

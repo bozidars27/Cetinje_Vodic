@@ -37,6 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_IMAGE = "image";
     private static final String TABLE_VIDEO = "video";
     private static final String TABLE_TEXT = "text";
+    private static final String TABLE_EVENT = "event";
 
     // Common column names
     private static final String KEY_ID = "id";
@@ -79,6 +80,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // TEXT Table - column names
     private static final String KEY_ID_VIDEO = "id_video";
     private static final String KEY_TITLE = "title";
+
+    // EVENT Table - column names
+    private static final String KEY_DATETIME = "date_time";
 
     // Table Create Statements
     // Country table create statement
@@ -184,6 +188,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_TITLE + " TEXT, "
             + " FOREIGN KEY ("+KEY_ID_VIDEO+") REFERENCES " + TABLE_VIDEO + "(" +KEY_ID +"))";
 
+    // Event table create statement
+    private static final String CREATE_TABLE_EVENT = "CREATE TABLE "
+            + TABLE_EVENT + "(" + KEY_ID + " INTEGER PRIMARY KEY, "
+            + KEY_ID_TOWN + " INTEGER, "
+            + KEY_NAME + " TEXT, "
+            + KEY_DESCRIPTION + " TEXT, "
+            + KEY_DATETIME + " TEXT, "
+            + " FOREIGN KEY ("+KEY_ID_TOWN+") REFERENCES " + TABLE_TOWN + "(" +KEY_ID +"))";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -204,6 +217,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_IMAGE);
         db.execSQL(CREATE_TABLE_VIDEO);
         db.execSQL(CREATE_TABLE_TEXT);
+        db.execSQL(CREATE_TABLE_EVENT);
     }
 
     @Override
@@ -221,6 +235,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_IMAGE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VIDEO);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEXT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
 
         // create new tables
         onCreate(db);
@@ -297,6 +312,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEXT);
         db.execSQL(CREATE_TABLE_TEXT);
+    }
+    public void reCreateTableEvent(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        db.execSQL(CREATE_TABLE_EVENT);
     }
 
     public double createCountry(Country country) {
@@ -642,6 +662,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
         return restaurants;
+    }
+
+    public double createEvent(Events even) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, even.getId());
+        values.put(KEY_ID_TOWN, even.getId_town());
+        values.put(KEY_NAME, even.getName());
+        values.put(KEY_DESCRIPTION, even.getDescription());
+        values.put(KEY_DATETIME, even.getDate_time());
+
+        // insert row
+        float even_id = db.insert(TABLE_EVENT, null, values);
+
+        return even_id;
+    }
+    //lista dogadjaja iz lokalne baze
+    public ArrayList<Events> getAllEvents() {
+        ArrayList<Events> events = new ArrayList<Events>();
+        String selectQuery = "SELECT  * FROM " + TABLE_EVENT;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Events eventEl = new Events(c.getInt(c.getColumnIndex(KEY_ID)),
+                        c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
+                        c.getString(c.getColumnIndex(KEY_NAME)),
+                        c.getString(c.getColumnIndex(KEY_DESCRIPTION)),
+                        c.getString(c.getColumnIndex(KEY_DATETIME)));
+
+                // adding to todo list
+                events.add(eventEl);
+            } while (c.moveToNext());
+        }
+        return events;
     }
 
     // closing database
