@@ -126,6 +126,7 @@ public class CulturalHeritageRecyclerAdapter extends RecyclerView.Adapter<Cultur
                     }
                 }
                 dialog.hide();
+                dialog.dismiss();
             }
         });
 

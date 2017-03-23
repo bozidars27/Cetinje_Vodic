@@ -815,7 +815,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //lista dogadjaja iz lokalne baze
     public ArrayList<Events> getAllEvents() {
         ArrayList<Events> events = new ArrayList<Events>();
-        String selectQuery = "SELECT  * FROM " + TABLE_EVENT;
+        String selectQuery = "SELECT  * FROM " + TABLE_EVENT + " ORDER BY " + KEY_DATETIME;
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);

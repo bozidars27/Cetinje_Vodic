@@ -241,7 +241,7 @@ public class DataBaseHandler {
 
                                     }
 
-                                    unzip(imagesSave, unzipDir);
+                                    unzipPrivate(imagesSave, applicationContext, dir);
 
                                 }
 
@@ -790,41 +790,6 @@ public class DataBaseHandler {
     public void insertIntoDatabase(){
 
         requestQueue = Volley.newRequestQueue(applicationContext);
-    }
-
-    public static void unzip(File zipFile, File targetDirectory) throws IOException {
-
-        ZipInputStream zipInputStream = new ZipInputStream( new BufferedInputStream( new FileInputStream(zipFile) ) );
-
-        try {
-
-            ZipEntry zipEntry;
-            int count;
-
-            byte[] buffer = new byte[8192];
-
-            if (!targetDirectory.exists())
-                targetDirectory.mkdir();
-
-            while( (zipEntry = zipInputStream.getNextEntry()) != null ) {
-
-                File file = new File(targetDirectory, zipEntry.getName());
-                FileOutputStream fileOutputStream = new FileOutputStream(file);
-
-                try {
-                    while ( (count = zipInputStream.read(buffer)) != -1 ) {
-                        fileOutputStream.write(buffer, 0, count);
-                    }
-                } finally {
-                    fileOutputStream.close();
-                }
-
-            }
-
-        } finally{
-            zipInputStream.close();
-        }
-
     }
 
     public static void unzipPrivate(File zipFile, Context applicationContext, File deleteDir) throws IOException {

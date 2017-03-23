@@ -47,9 +47,9 @@ class GalleryRecyclerAdapter extends RecyclerView.Adapter{
         if (data.get(position) instanceof City) {
             City currentCity = (City) data.get(position);
             ((SectionViewHolder) holder).title.setText(currentCity.getName());
-            Glide.with(context).load( new File(galleryImagesDirectory + currentCity.getPictures().get(0).getImageName()) ).into(((SectionViewHolder) holder).imageView);
+            Glide.with(context).load(context.getFileStreamPath(currentCity.getPictures().get(0).getImageName())).into(((SectionViewHolder) holder).imageView);
         } else {
-            Glide.with(context).load( new File(galleryImagesDirectory + ((Image) data.get(position)).getImageName()) ).into(((GalleryViewHolder) holder).imageView);
+            Glide.with(context).load(context.getFileStreamPath(((Image) data.get(position)).getImageName())).into(((GalleryViewHolder) holder).imageView);
             ((GalleryViewHolder) holder).boundedImageObject = (Image) data.get(position);
         }
 
