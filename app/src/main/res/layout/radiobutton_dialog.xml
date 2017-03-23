@@ -8,10 +8,10 @@
         android:id="@+id/radio_group"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-
-
         android:layout_gravity="center_vertical"
-        android:orientation="vertical">
+        android:background="@android:color/transparent"
+        android:orientation="vertical"
+        android:padding="20dp">
 
 
     </RadioGroup>

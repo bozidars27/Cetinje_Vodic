@@ -109,6 +109,7 @@ public class CulturalHeritageRecyclerAdapter extends RecyclerView.Adapter<Cultur
             for(int i=0;i<videos.size();i++){
                 RadioButton rb=new RadioButton(context); // dynamically creating RadioButton and adding to RadioGroup.
                 rb.setText(videos.get(i).getName());
+                rb.setPadding(0, getPixels(5, context), 0, getPixels(5, context));
                 rg.addView(rb);
             }
             dialog.show();
@@ -130,5 +131,10 @@ public class CulturalHeritageRecyclerAdapter extends RecyclerView.Adapter<Cultur
             }
         });
 
+    }
+
+    public static int getPixels(int dpValue, Context context){
+        float scale = context.getResources().getDisplayMetrics().density;
+        return  (int) (dpValue*scale + 0.5f);
     }
 }
