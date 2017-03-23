@@ -195,6 +195,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ID_TOWN + " INTEGER, "
             + KEY_NAME + " TEXT, "
             + KEY_DESCRIPTION + " TEXT, "
+            + KEY_LOGO + " TEXT, "
             + KEY_DATETIME + " TEXT, "
             + " FOREIGN KEY ("+KEY_ID_TOWN+") REFERENCES " + TABLE_TOWN + "(" +KEY_ID +"))";
 
@@ -450,6 +451,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return c.getCount() > 0;
     }
 
+    public double createQuiz(Quiz quiz) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, quiz.getId());
+        values.put(KEY_ID_TOUR, quiz.getId_tour());
+        values.put(KEY_QUESTION, quiz.getQuestion());
+        values.put(KEY_TYPE, quiz.getType());
+        values.put(KEY_TANS, quiz.getTans());
+        values.put(KEY_FANS1, quiz.getFans1());
+        values.put(KEY_FANS2, quiz.getFans2());
+        values.put(KEY_FANS3, quiz.getFans3());
+
+        // insert row
+        float quiz_id = db.insert(TABLE_QUIZ, null, values);
+
+        return quiz_id;
+    }
+
+    public ArrayList<Quiz> getAllQuizes() {
+        ArrayList<Quiz> quizzes = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_QUIZ;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Quiz quiz = new Quiz(c.getInt((c.getColumnIndex(KEY_ID))),
+                        c.getInt(c.getColumnIndex(KEY_ID_TOUR)),
+                        c.getString(c.getColumnIndex(KEY_QUESTION)),
+                        c.getInt(c.getColumnIndex(KEY_TYPE)),
+                        c.getString(c.getColumnIndex(KEY_TANS)),
+                        c.getString(c.getColumnIndex(KEY_FANS1)),
+                        c.getString(c.getColumnIndex(KEY_FANS2)),
+                        c.getString(c.getColumnIndex(KEY_FANS3))
+                );
+
+                // adding to todo list
+                quizzes.add(quiz);
+            } while (c.moveToNext());
+        }
+
+        return quizzes;
+    }
+
     public float createPath(Path path) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -600,6 +648,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return videos;
     }
 
+    public ArrayList<Video> getCulturalHeritageVideos(String videoId) {
+        ArrayList<Video> videos = new ArrayList<Video>();
+        String selectQuery = "SELECT  * FROM " + TABLE_VIDEO + " WHERE " + KEY_ID_CULTURAL_HERITAGE + " = " + videoId;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Video video = new Video(c.getInt(c.getColumnIndex(KEY_ID)),
+                        c.getInt(c.getColumnIndex(KEY_ID_CULTURAL_HERITAGE)),
+                        c.getString(c.getColumnIndex(KEY_NAME)),
+                        c.getInt(c.getColumnIndex(KEY_IND)) > 0);
+
+                // adding to todo list
+                videos.add(video);
+            } while (c.moveToNext());
+        }
+        return videos;
+    }
+
     public float createImage(Image image) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -696,7 +766,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return restaurants;
     }
 
-    public Restaurant getSpecificRestaurants(int id) {
+    public Restaurant getSpecificRestaurants(String id) {
         Restaurant restaurant;
         String selectQueryFeedback = "SELECT * FROM " + TABLE_FEEDBACK + " WHERE " + KEY_ID_RESTAURANT + " = " + id;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -726,20 +796,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return restaurant;
     }
 
-    public double createEvent(Events even) {
+    public double createEvent(Events event) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, even.getId());
-        values.put(KEY_ID_TOWN, even.getId_town());
-        values.put(KEY_NAME, even.getName());
-        values.put(KEY_DESCRIPTION, even.getDescription());
-        values.put(KEY_DATETIME, even.getDate_time());
+        values.put(KEY_ID, event.getId());
+        values.put(KEY_ID_TOWN, event.getId_town());
+        values.put(KEY_NAME, event.getName());
+        values.put(KEY_DESCRIPTION, event.getDescription());
+        values.put(KEY_LOGO, event.getLogo());
+        values.put(KEY_DATETIME, event.getDate_time());
 
         // insert row
-        float even_id = db.insert(TABLE_EVENT, null, values);
+        float event_id = db.insert(TABLE_EVENT, null, values);
 
-        return even_id;
+        return event_id;
     }
     //lista dogadjaja iz lokalne baze
     public ArrayList<Events> getAllEvents() {
@@ -756,6 +827,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
                         c.getString(c.getColumnIndex(KEY_NAME)),
                         c.getString(c.getColumnIndex(KEY_DESCRIPTION)),
+                        c.getString(c.getColumnIndex(KEY_LOGO)),
                         c.getString(c.getColumnIndex(KEY_DATETIME)));
 
                 // adding to todo list
@@ -763,6 +835,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
         return events;
+    }
+
+    public Events getSpecificEvent(String id) {
+        String selectQuery = "SELECT  * FROM " + TABLE_EVENT + " WHERE id = " + id;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        c.moveToFirst();
+        Events event = new Events(c.getInt(c.getColumnIndex(KEY_ID)),
+                c.getInt(c.getColumnIndex(KEY_ID_TOWN)),
+                c.getString(c.getColumnIndex(KEY_NAME)),
+                c.getString(c.getColumnIndex(KEY_DESCRIPTION)),
+                c.getString(c.getColumnIndex(KEY_LOGO)),
+                c.getString(c.getColumnIndex(KEY_DATETIME)));
+        return event;
     }
 
     // closing database

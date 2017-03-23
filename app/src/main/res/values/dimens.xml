@@ -38,5 +38,31 @@
     <dimen name="title_restaurant_top">10dp</dimen>
     <dimen name="title_restaurant_left">5dp</dimen>
 
+    <!-- Kviz -->
+    <dimen name="question_strip_width">70dp</dimen>
+    <dimen name="question_strip_padding">15dp</dimen>
+    <dimen name="question_margin">50dp</dimen>
+    <dimen name="question_font">30sp</dimen>
+
+    <dimen name="multiple_choice_answer_margin">50dp</dimen>
+    <dimen name="multiple_choice_answer_element_margin">10dp</dimen>
+    <dimen name="multiple_choice_answer_padding">15dp</dimen>
+    <dimen name="answer_width">230dp</dimen>
+    <dimen name="answer_height">60dp</dimen>
+
+    <dimen name="text_view_elevation">10dp</dimen>
+
+    <dimen name="score_circle_radius">50dp</dimen>
+    <dimen name="circle_margin">10dp</dimen>
+
+    <dimen name="answer_margin_left">15dp</dimen>
+    <dimen name="answer_margin_right">15dp</dimen>
+    <dimen name="answer_margin_top">170dp</dimen>
+    <dimen name="answer_font">20sp</dimen>
+
+    <dimen name="number_answer_margin_left">40dp</dimen>
+    <dimen name="number_answer_margin_right">40dp</dimen>
+    <dimen name="number_answer_bgd">180dp</dimen>
+
 
 </resources>

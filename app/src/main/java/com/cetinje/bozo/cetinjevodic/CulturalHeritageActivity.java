@@ -8,30 +8,28 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class EventActivity extends AppCompatActivity {
+public class CulturalHeritageActivity extends AppCompatActivity {
 
-    TextView titleTextView;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private DatabaseHelper db;
-    private ArrayList<Events> events;
+    private ArrayList<CulturalHeritage> culturalHeritages;
+    private TextView textViewTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event);
-
-        titleTextView = (TextView) findViewById(R.id.app_title);
-        titleTextView.setText(getResources().getString(R.string.event_title));
+        setContentView(R.layout.activity_cultural_heritage);
+        textViewTitle = (TextView) findViewById(R.id.app_title);
+        textViewTitle.setText(getResources().getString(R.string.cultural_heritage_title));
         db = new DatabaseHelper(getApplicationContext());
-        events = db.getAllEvents();
-        recyclerView = (RecyclerView) findViewById(R.id.event_recycler_view);
-        adapter = new EventRecyclerAdapter(getApplicationContext(), events);
+        culturalHeritages = db.getAllCulturalHeritages();
+        recyclerView = (RecyclerView) findViewById(R.id.cultural_heritage_recycler_view);
+        adapter = new CulturalHeritageRecyclerAdapter(getApplicationContext(), culturalHeritages);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
-
     }
 }

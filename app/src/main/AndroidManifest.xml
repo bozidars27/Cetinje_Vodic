@@ -38,7 +38,11 @@
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".RestaurantActivity" />
         <activity android:name=".EventActivity" />
-        <activity android:name=".RestaurantPagerActivity"></activity>
+        <activity android:name=".RestaurantPagerActivity" />
+        <activity android:name=".EventPagerActivity" />
+        <activity android:name=".CulturalHeritageActivity" />
+        <activity android:name=".CulturalHeritagePagerActivity" />
+        <activity android:name=".QuizActivity"></activity>
     </application>
 
 </manifest>

@@ -10,7 +10,18 @@
 
     <!-- Restorani -->
     <string name="restaurant_title">Restorani</string>
+    <string name="restaurant_title1">Ime restorana:</string>
     <string name="restaurant_description">Opis:</string>
+
+    <!-- CulturalHeritage -->
+    <string name="cultural_heritage_title">Znamenitosti</string>
+    <string name="cultural_heritage_name">Naziv:</string>
+    <string name="cultural_heritage_description">Opis:</string>
+
+    <!-- Events -->
+    <string name="event_title">Događaji</string>
+    <string name="event_name">Naziv:</string>
+    <string name="event_start">Vrijeme održavanja:</string>
 
     <!-- Strings related to MainActivity-->
     <string name="scan_barcode_button">Scan barcode</string>

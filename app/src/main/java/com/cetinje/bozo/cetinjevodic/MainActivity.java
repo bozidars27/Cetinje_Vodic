@@ -192,6 +192,17 @@ public class MainActivity extends AppCompatActivity {
                     }, 400);
 
                 }
+                else if (event.getAction() == MotionEvent.ACTION_UP && currentlyUp == objects){
+
+                    (new Handler()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent i = new Intent(getBaseContext(), CulturalHeritageActivity.class);
+                            startActivity(i);
+                        }
+                    }, 400);
+
+                }
                 else if (event.getAction() == MotionEvent.ACTION_UP && currentlyUp == gallery){
 
                     (new Handler()).postDelayed(new Runnable() {
@@ -220,6 +231,17 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Intent i = new Intent(getBaseContext(), EventActivity.class);
+                            startActivity(i);
+                        }
+                    }, 400);
+
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP && currentlyUp == quiz){
+
+                    (new Handler()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent i = new Intent(getBaseContext(), QuizActivity.class);
                             startActivity(i);
                         }
                     }, 400);

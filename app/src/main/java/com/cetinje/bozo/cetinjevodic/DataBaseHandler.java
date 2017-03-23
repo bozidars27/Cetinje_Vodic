@@ -30,9 +30,9 @@ import java.util.zip.ZipInputStream;
 public class DataBaseHandler {
 
     Context applicationContext;
-    //private String server = "http://192.168.100.3/";
-    //private String server = "http://89.188.33.189/";
-    private String server = "http://192.168.100.5/";
+    private String server = "http://89.188.33.186/";
+    //private String server = "http://89.188.33.169/";
+    //private String server = "http://192.168.100.5/";
 
     private RequestQueue requestQueue;
     private String readUrlCountry = server + "countries";
@@ -47,7 +47,10 @@ public class DataBaseHandler {
     private String readUrlGallery = server + "image";
     private String getGalleryImagesUrl = server + "Images/gallery_images.zip";
     private String getLogoImagesUrl = server + "Logos/Logos.zip";
+    private String getEventImagesUrl = server + "Event/Event.zip";
+    private String getCulturalHeritageImagesUrl = server + "CulturalHeritage/cultural_heritage.zip";
     private String getFeedbacksUrl = server + "feedback";
+    private String readUrlQuiz = server + "quiz";
     private DatabaseHelper db;
     public DataBaseHandler(Context applicationContext, DatabaseHelper db) {
         this.applicationContext = applicationContext;
@@ -64,8 +67,102 @@ public class DataBaseHandler {
         getReadUrlCulturalHeritage += "?code="+code;
         readUrlEvents += "?code="+code;
         getFeedbacksUrl += "?code="+code;
+        readUrlQuiz += "?code="+code;
         requestQueue = Volley.newRequestQueue(applicationContext);
 
+
+        InputStreamVolleyRequest culturalHeritageImagesDownloadRequest = new InputStreamVolleyRequest(Request.Method.GET, getCulturalHeritageImagesUrl,
+
+                new Response.Listener<byte[]>() {
+                    @Override
+                    public void onResponse(byte[] response) {
+
+                        try {
+                            if(response != null) {
+                                String savingPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/cultural_heritage_images";
+                                File dir = new File(savingPath);
+                                if (!dir.exists())
+                                    dir.mkdir();
+                                File imagesSave = new File(dir, "cultural_heritage_images.zip");
+                                if(!imagesSave.exists()) {
+
+                                    try {
+                                        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(imagesSave));
+                                        bos.write(response);
+                                        bos.flush();
+                                        bos.close();
+
+                                    } catch (Exception e) {
+                                    }
+                                    unzipPrivate(imagesSave, applicationContext, dir);
+
+                                }
+
+                            }
+
+
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                    }
+                }, null);
+
+
+        InputStreamVolleyRequest eventImagesDownloadRequest = new InputStreamVolleyRequest(Request.Method.GET, getEventImagesUrl,
+
+                new Response.Listener<byte[]>() {
+                    @Override
+                    public void onResponse(byte[] response) {
+
+                        try {
+                            if(response != null) {
+                                String savingPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/event_images";
+                                File dir = new File(savingPath);
+                                if (!dir.exists())
+                                    dir.mkdir();
+                                File imagesSave = new File(dir, "event_images.zip");
+                                if(!imagesSave.exists()) {
+
+                                    try {
+                                        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(imagesSave));
+                                        bos.write(response);
+                                        bos.flush();
+                                        bos.close();
+
+                                    } catch (Exception e) {
+                                    }
+                                    unzipPrivate(imagesSave, applicationContext, dir);
+
+                                }
+
+                            }
+
+
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                    }
+                }, null);
 
         InputStreamVolleyRequest logoImagesDownloadRequest = new InputStreamVolleyRequest(Request.Method.GET, getLogoImagesUrl,
 
@@ -90,7 +187,7 @@ public class DataBaseHandler {
 
                                     } catch (Exception e) {
                                     }
-                                    unzipPrivate(imagesSave, applicationContext);
+                                    unzipPrivate(imagesSave, applicationContext, dir);
 
                                 }
 
@@ -166,6 +263,48 @@ public class DataBaseHandler {
 
                     }
                 }, null);
+
+        JsonObjectRequest quizQuestionsRequest = new JsonObjectRequest(Request.Method.GET, readUrlQuiz, null,
+
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+
+                        if (db.getAllQuizes().size() == 0) {
+
+                            try {
+                                JSONArray questionsJsonArray = response.getJSONArray("Quiz");
+
+                                for (int i = 0; i < questionsJsonArray.length(); i++) {
+                                    JSONObject questionsJsonObject = questionsJsonArray.getJSONObject(i);
+
+                                    db.createQuiz(new Quiz(questionsJsonObject.getInt("id"),
+                                            questionsJsonObject.getInt("id_tour"),
+                                            questionsJsonObject.getString("question"),
+                                            questionsJsonObject.getInt("type"),
+                                            questionsJsonObject.getString("Tans"),
+                                            questionsJsonObject.getString("Fans1"),
+                                            questionsJsonObject.getString("Fans2"),
+                                            questionsJsonObject.getString("Fans3")));
+
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Log.e("QUIZ URL", "URL: " + readUrlQuiz);
+                    }
+                });
 
 
         //Povlačenje tekstualnih podataka za galeriju
@@ -566,6 +705,7 @@ public class DataBaseHandler {
                                             speciesJsonObject.getInt("id_town"),
                                             speciesJsonObject.getString("name"),
                                             speciesJsonObject.getString("description"),
+                                            speciesJsonObject.getString("logo"),
                                             speciesJsonObject.getString("date_time")
                                     ));
                                 }
@@ -584,7 +724,7 @@ public class DataBaseHandler {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Log.e("greska", error.getMessage());
                     }
                 });
 
@@ -601,6 +741,9 @@ public class DataBaseHandler {
         requestQueue.add(galleryImagesDownloadRequest);
         requestQueue.add(galleryDataRequest);
         requestQueue.add(logoImagesDownloadRequest);
+        requestQueue.add(eventImagesDownloadRequest);
+        requestQueue.add(quizQuestionsRequest);
+        requestQueue.add(culturalHeritageImagesDownloadRequest);
         requestQueue.add(jsonObjectRequestFeedback);
 
     }
@@ -684,7 +827,7 @@ public class DataBaseHandler {
 
     }
 
-    public static void unzipPrivate(File zipFile, Context applicationContext) throws IOException {
+    public static void unzipPrivate(File zipFile, Context applicationContext, File deleteDir) throws IOException {
         ZipInputStream zipInputStream = new ZipInputStream( new BufferedInputStream( new FileInputStream(zipFile) ) );
 
         try {
@@ -711,7 +854,7 @@ public class DataBaseHandler {
 
         } finally{
             zipInputStream.close();
-            //FileUtils.deleteDirectory(zipFile);
+            FileUtils.deleteDirectory(deleteDir);
         }
 
     }

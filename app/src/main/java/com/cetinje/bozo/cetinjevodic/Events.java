@@ -9,16 +9,18 @@ public class Events {
     int id_town;
     String name;
     String description;
+    String logo;
     String date_time;
 
     public Events() {
     }
 
-    public Events(int id, int id_town, String name, String description, String date_time) {
+    public Events(int id, int id_town, String name, String description, String logo, String date_time) {
         this.id = id;
         this.id_town = id_town;
         this.name = name;
         this.description = description;
+        this.logo = logo;
         this.date_time = date_time;
     }
 
@@ -52,6 +54,14 @@ public class Events {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
     public String getDate_time() {
