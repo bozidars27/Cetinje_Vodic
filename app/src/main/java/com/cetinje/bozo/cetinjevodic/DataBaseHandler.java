@@ -30,7 +30,8 @@ import java.util.zip.ZipInputStream;
 public class DataBaseHandler {
 
     Context applicationContext;
-    private String server = "http://89.188.33.186/";
+    //private String server = "http://89.188.33.186/";
+    private String server = "http://192.168.43.195/";
     //private String server = "http://89.188.33.169/";
     //private String server = "http://192.168.100.5/";
 
@@ -581,7 +582,7 @@ public class DataBaseHandler {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("VOLLEY", error.getMessage());
+                        //Log.e("VOLLEY", error.getMessage());
                     }
                 });
 

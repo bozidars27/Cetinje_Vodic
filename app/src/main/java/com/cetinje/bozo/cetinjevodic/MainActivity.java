@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
@@ -13,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -23,10 +25,17 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.Manifest;
 import com.bumptech.glide.Glide;
+import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnShowcaseEventListener {
+    SharedPreferences prefs = null;
+    int tutorialPosition;
+    ViewTarget target;
     ImageView background;
     ImageView banner;
     RelativeLayout middle;
@@ -57,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        prefs = getSharedPreferences("com.cetinje.bozo.cetinjevodic", MODE_PRIVATE);
 
         db = new DatabaseHelper(getApplicationContext());
         dbH = new DataBaseHandler(getApplicationContext(), db);
@@ -68,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
             dbH.readFromDatabase(intent.getStringExtra(BarcodeObject));
         }
         //Toast.makeText(getApplicationContext(), String.valueOf(db.getAllCountrys().size()), Toast.LENGTH_SHORT).show();
-
 
         background = (ImageView) findViewById(R.id.bg);
         banner = (ImageView) findViewById(R.id.banner);
@@ -254,6 +263,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (prefs.getBoolean("firstrun", true)) {
+            target = new ViewTarget(R.id.route, this);
+            new ShowcaseView.Builder(this)
+                    .withMaterialShowcase()
+                    .setTarget(target)
+                    .setContentTitle(getResources().getString(R.string.route_title))
+                    .setContentText(getResources().getString(R.string.route_description))
+                    .setStyle(R.style.CustomShowcaseTheme2)
+                    .setShowcaseEventListener(this)
+                    .build();
+            tutorialPosition = 1;
+            //prefs.edit().putBoolean("firstrun", false).commit();
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         Intent i = new Intent(this, QRcodeActivity.class);
         startActivity(i);
@@ -345,5 +373,68 @@ public class MainActivity extends AppCompatActivity {
 
         set.start();
 
+    }
+
+    @Override
+    public void onShowcaseViewHide(ShowcaseView showcaseView) {
+
+    }
+
+    @Override
+    public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
+        switch(tutorialPosition) {
+            case 1 :
+                target = new ViewTarget(R.id.objects, this);
+                showcaseView.setTarget(target);
+                showcaseView.setContentTitle(getResources().getString(R.string.objects_title));
+                showcaseView.setContentText(getResources().getString(R.string.objects_description));
+                Log.e("e", String.valueOf(showcaseView.isShown()));
+                showcaseView.show();
+                Log.e("e", String.valueOf(showcaseView.isShown()));
+                tutorialPosition++;
+                break; // optional
+
+            case 2 :
+                target = new ViewTarget(R.id.gallery, this);
+                showcaseView.setTarget(target);
+                showcaseView.setContentTitle(getResources().getString(R.string.gallery_title));
+                showcaseView.setContentText(getResources().getString(R.string.gallery_description));
+                showcaseView.show();
+                tutorialPosition++;
+                break;
+            case 3 :
+                target = new ViewTarget(R.id.restaurants, this);
+                showcaseView.setTarget(target);
+                showcaseView.setContentTitle(getResources().getString(R.string.restaurant_title));
+                showcaseView.setContentText(getResources().getString(R.string.restaurant_description));
+                showcaseView.show();
+                tutorialPosition++;
+                break;
+            case 4 :
+                target = new ViewTarget(R.id.news, this);
+                showcaseView.setTarget(target);
+                showcaseView.setContentTitle(getResources().getString(R.string.news_title));
+                showcaseView.setContentText(getResources().getString(R.string.news_description));
+                showcaseView.show();
+                tutorialPosition++;
+                break;
+            case 5 :
+                target = new ViewTarget(R.id.quiz, this);
+                showcaseView.setTarget(target);
+                showcaseView.setContentTitle(getResources().getString(R.string.quiz_title));
+                showcaseView.setContentText(getResources().getString(R.string.quiz_description));
+                showcaseView.show();
+                tutorialPosition++;
+                break;
+        }
+    }
+
+    @Override
+    public void onShowcaseViewShow(ShowcaseView showcaseView) {
+
+    }
+
+    @Override
+    public void onShowcaseViewTouchBlocked(MotionEvent motionEvent) {
     }
 }
